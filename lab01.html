@@ -14,8 +14,98 @@
 	 </header>
 
 	<h1>Lab 1</h1>
-    <p>Prelab<p>
+	
+    <h2>Prelab</h2>
+	
     <p><p>
-	In the prelab, we connected the Artemis to the Mac via Bluetooth. 
+	In the prelab, we connected the Artemis to the Mac via Bluetooth. I skipped loading the virtual environment and went a bit rogue.  Then, I installed all of the required python packages.
+	
+	I downloaded the codebase with the python and Ardiono support files, and started the Jupyter server.  Then, I flashed the ble_arduino.ino file into the Artermis, obtained the Artermis BLE MAC address, and created a new uuid.
+	<p></p>
+	
+	<code>	
+	artemis_address: 'c0:ec:f2:c2:23:04'
+	</code>
+	<p></p>
+	
+	<code>	
+	ble_service: 'fbaf56fb-a094-4bf5-b5b9-71571ba584a7'
+	</code>
+	
+    <p><p>
+		
+    <h2>Tasks</h2>
+	
+    <p><p>
+	The first task was to send the ECHO command and receive the string value 'Robot says -> HiHello :)'.  That Arduido code is below:
+    <p><p>
+	
+	<code>
+	case ECHO:
+	
+			char char_arr[MAX_MSG_SIZE];
+
+	            // Extract the next value from the command string as a character array
+	            success = robot_cmd.get_next_value(char_arr);
+	            if (!success)
+	                return;
+
+	            /*
+	             * Your code goes here
+	             */
+	            tx_estring_value.clear();
+	            tx_estring_value.append("Robot says -> ");
+	            tx_estring_value.append(char_arr);
+	            tx_estring_value.append(" :)");
+	            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+	            // Serial.print("Sent back: ");
+	            // Serial.println(tx_estring_value.c_str());
+
+	            break;
+	</code>
+	<p></p>
+	I then created a new command, GET_TIME_MILLIS, which makes Artemis reply with the time stamp (in ms) preceeded by "T:".  The Arduido code is below, as well as the Jupyter notebook code.
+	<p></p>
+	
+	<code>
+    case GET_TIME_MILLIS:
+
+        tx_estring_value.clear();
+        tx_estring_value.append("T:");
+        tx_estring_value.append((int)millis());
+        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+        // Serial.print("Sent back: ");
+        // Serial.println(tx_estring_value.c_str());
+
+        break;
+	</code>
+	<p></p>
+	
+	<code>
+		ble.send_command(CMD.GET_TIME_MILLIS, "")
+	</code>
+	<p></p>
+
+		In addition, I created the notiication handler than received the timestapms from the Artemis and printed them out side the Jupyter notebook.  That code is below.
+		
+	<p></p>
+
+	<code>
+	# Notification Handler
+	def notification_handler(uuid, byte_array):
+	    time = ble.bytearray_to_string(byte_array).split(',')[2:]
+	    print(time)
+
+	ble.start_notify(ble.uuid['RX_STRING'], notification_handler)
+	</code>
+	<p></p>
+
+		
+	
+	
+	
+	
  </body>
 </html>
