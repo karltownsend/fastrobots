@@ -1,0 +1,233 @@
+2024-07-28 08:53:38,224 | MainThread   | [DEBUG   ] | <module>            |: debug
+2024-07-28 08:53:38,224 | MainThread   | [INFO    ] | <module>            |: info
+2024-07-28 08:53:38,225 | MainThread   | [WARNING ] | <module>            |: warning
+2024-07-28 08:53:38,226 | MainThread   | [ERROR   ] | <module>            |: error
+2024-07-28 08:53:38,227 | MainThread   | [CRITICAL] | <module>            |: critical
+2024-07-28 08:54:32,126 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-07-28 08:54:32,128 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.5-arm64-arm-64bit
+2024-07-28 08:54:32,128 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 08:54:44,521 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 08:54:47,458 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 08:55:15,890 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2024-07-28 08:56:34,860 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 08:57:08,699 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 08:57:11,573 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 16:40:49,288 | MainThread   | [DEBUG   ] | <module>            |: debug
+2024-07-28 16:40:49,289 | MainThread   | [INFO    ] | <module>            |: info
+2024-07-28 16:40:49,290 | MainThread   | [WARNING ] | <module>            |: warning
+2024-07-28 16:40:49,291 | MainThread   | [ERROR   ] | <module>            |: error
+2024-07-28 16:40:49,292 | MainThread   | [CRITICAL] | <module>            |: critical
+2024-07-28 16:40:59,596 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 16:41:11,115 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 16:41:36,031 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 16:46:38,899 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 16:47:25,080 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 16:47:27,907 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 16:47:35,172 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2024-07-28 17:56:57,922 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 17:58:02,459 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 17:58:05,300 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 17:59:17,509 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 17:59:45,177 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 17:59:48,049 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 20:42:15,590 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 20:42:37,372 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 20:43:15,403 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 20:43:35,417 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 20:44:00,229 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 20:44:03,155 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 20:56:38,429 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 20:59:36,576 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 20:59:39,521 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 21:01:46,818 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 21:02:11,124 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 21:02:14,046 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 21:03:30,055 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 21:03:49,003 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 21:03:51,876 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-28 21:08:35,176 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-28 21:09:16,386 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-28 21:09:19,264 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-29 10:50:21,108 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-29 15:12:16,817 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-29 15:12:19,711 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-29 15:28:37,524 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:24:54,182 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:24:57,089 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:34:04,773 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:34:12,814 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:34:15,659 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:35:29,120 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:35:37,066 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:35:39,990 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:36:31,851 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:36:38,261 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:36:41,250 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:38:19,893 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2024-07-30 09:38:36,806 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:38:46,686 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:38:49,591 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:39:15,165 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:39:22,192 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:39:25,080 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 09:41:48,363 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-30 09:41:57,387 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 09:42:00,307 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 10:03:46,447 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 10:04:32,902 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-07-30 10:04:32,905 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2024-07-30 10:04:32,906 | MainThread   | [WARNING ] | exit_handler        |: Not connected to a BLE device
+2024-07-30 10:05:12,938 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-07-30 10:05:12,939 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.5-arm64-arm-64bit
+2024-07-30 10:05:12,939 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-30 10:05:15,907 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-30 11:00:24,902 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 16:01:51,168 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-07-31 16:01:51,168 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-07-31 16:01:51,168 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 16:01:54,238 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 16:57:19,716 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 16:57:32,929 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 16:57:36,030 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 16:58:30,218 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 16:59:07,177 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 16:59:10,080 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 16:59:32,791 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:23:27,039 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:23:29,942 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:26:37,918 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:26:54,858 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:26:57,746 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:36:02,859 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:36:09,764 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:36:12,701 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:38:18,402 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:38:26,727 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:38:29,615 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:41:22,207 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:41:37,144 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:41:40,025 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:42:28,556 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:42:33,875 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:42:36,725 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 21:48:18,899 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-07-31 21:49:20,234 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-07-31 21:49:23,125 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-07-31 22:39:48,164 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-01 16:37:49,183 | MainThread   | [DEBUG   ] | <module>            |: debug
+2024-08-01 16:37:49,184 | MainThread   | [INFO    ] | <module>            |: info
+2024-08-01 16:37:49,185 | MainThread   | [WARNING ] | <module>            |: warning
+2024-08-01 16:37:49,186 | MainThread   | [ERROR   ] | <module>            |: error
+2024-08-01 16:37:49,187 | MainThread   | [CRITICAL] | <module>            |: critical
+2024-08-01 16:39:27,315 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-01 16:39:27,315 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-01 16:39:27,315 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 16:39:30,250 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-01 18:00:42,871 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:00:59,830 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:02:08,853 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:02:49,597 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:03:11,255 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-01 18:03:11,257 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2024-08-01 18:03:11,257 | MainThread   | [WARNING ] | exit_handler        |: Not connected to a BLE device
+2024-08-01 18:03:20,550 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-01 18:03:20,550 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-01 18:03:20,550 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:03:23,543 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-01 18:05:06,306 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-01 18:05:14,654 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-01 18:05:17,507 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-01 18:05:24,678 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2024-08-02 13:20:14,921 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 13:20:25,161 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 13:20:36,182 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 13:20:39,066 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 13:24:50,165 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-02 13:24:50,169 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 13:24:50,170 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-02 13:24:50,261 | MainThread   | [WARNING ] | __del__             |: Could not delete BaseBLEController instance before exiting
+2024-08-02 13:24:50,265 | MainThread   | [WARNING ] | __del__             |: Not connected to a BLE device
+2024-08-02 13:25:00,762 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-02 13:25:00,762 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-02 13:25:00,762 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 13:25:03,739 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 13:25:51,114 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2024-08-02 13:25:58,083 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 13:26:15,279 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 13:26:18,195 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 13:31:18,415 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 13:31:52,267 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 13:31:55,180 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 22:33:25,868 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 22:34:10,400 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 22:34:13,260 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 22:38:11,411 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-02 22:38:11,417 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 22:38:11,418 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-02 22:38:20,199 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-02 22:38:20,199 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-02 22:38:20,199 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 22:38:23,129 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 22:39:43,652 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 22:39:59,286 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 22:40:02,182 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-02 22:41:38,107 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-02 22:41:38,113 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-02 22:41:38,114 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-02 22:41:44,741 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-02 22:41:44,741 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-02 22:41:44,742 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-02 22:41:47,727 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 10:25:05,781 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 10:25:17,985 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 10:25:27,311 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 10:25:30,250 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 10:28:52,907 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 10:28:52,910 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 10:28:52,910 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-03 10:29:01,673 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 10:29:01,674 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 10:29:01,674 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 10:29:04,634 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 10:29:38,768 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 10:29:38,771 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 10:29:38,772 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-03 10:29:44,352 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 10:29:44,353 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 10:29:44,353 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 10:29:47,359 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 10:31:52,466 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 10:31:52,472 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 10:31:52,473 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-03 10:31:52,547 | MainThread   | [WARNING ] | __del__             |: Could not delete BaseBLEController instance before exiting
+2024-08-03 10:31:52,552 | MainThread   | [WARNING ] | __del__             |: Not connected to a BLE device
+2024-08-03 10:33:11,433 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 10:33:11,433 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 10:33:11,433 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 10:33:14,443 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 19:10:23,753 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 19:10:42,289 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 19:10:49,767 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 19:10:49,767 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2024-08-03 19:10:49,768 | MainThread   | [WARNING ] | exit_handler        |: Not connected to a BLE device
+2024-08-03 19:10:56,579 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 19:10:56,579 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 19:10:56,579 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 19:10:59,509 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 19:15:42,023 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 19:15:42,029 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 19:15:42,030 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-03 19:15:55,474 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 19:15:55,474 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 19:15:55,475 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 19:15:58,451 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-08-03 19:35:42,095 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 19:35:42,098 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-08-03 19:35:42,098 | MainThread   | [INFO    ] | exit_handler        |: Gracefully Exiting
+2024-08-03 19:35:42,103 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2024-08-03 19:35:42,118 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2024-08-03 19:35:42,119 | MainThread   | [WARNING ] | exit_handler        |: Not connected to a BLE device
+2024-08-03 19:37:20,158 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-08-03 19:37:20,158 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-14.6-arm64-arm-64bit
+2024-08-03 19:37:20,158 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-08-03 19:37:23,207 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
