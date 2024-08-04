@@ -210,12 +210,8 @@
 		ble.send_command(CMD.GET_TEMP_READINGS, "")
 	</code>
 	<p></p>
-
-		
-		
-	
-	
-	
+	The new commands that buffer up the timestamps before sending ends up being able to send a lot more data in the same amount of time.  Sending one timestamp at a time allows for about a 2 KB/sec transfer rate.  When timestapms are first stored in an array and set over, the data rate increases to 270KB/sec.  
+	<p></p>	
 	
  </body>
 </html>
