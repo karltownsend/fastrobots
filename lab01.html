@@ -88,7 +88,7 @@
 	</code>
 	<p></p>
 
-		In addition, I created the notiication handler than received the timestapms from the Artemis and printed them out side the Jupyter notebook.  That code is below.
+		In addition, I created the notiication handler than received the timestamps from the Artemis and printed them inside the Jupyter notebook.  That code is below.
 		
 	<p></p>
 
@@ -102,6 +102,116 @@
 	</code>
 	<p></p>
 
+		Then, I created a new command, GET_TIME_MILLIS_LOOP, which contunally sends timestamps for 2 seconds to the computer.  The Arduino code and Jupyter notebook code is below.
+		
+	<p></p>
+
+	<code>
+        case GET_TIME_MILLIS_LOOP:
+
+            long time_start, cnt;
+            time_start = millis();
+            cnt = 0;
+            while (millis() - time_start < 2000) {
+              tx_estring_value.clear();
+              tx_estring_value.append("T:");
+              tx_estring_value.append((int)millis());
+              tx_characteristic_string.writeValue(tx_estring_value.c_str());
+              cnt = cnt + 1;
+            }
+
+            Serial.print("Total count: ");
+            Serial.println(cnt);
+
+            break;
+	</code>
+	<p></p>
+	
+	<code>
+	ble.send_command(CMD.GET_TIME_MILLIS_LOOP, "")
+	</code>
+	<p></p>
+
+	<p></p>
+
+		Then, I created two new commands, STORE_TIME_DATA and GET_TIME_DATA.  STORE_TIME_DATA fills an array with timestamp data without sending any strings to the computer.  The command GET_TIME_DATA then sends the entire array of string data to the computer, rather than with indiviudual messages like previous comands.  The Arduino code and Jupyter notebook code is below.
+		
+	<p></p>
+
+	<code>
+        case STORE_TIME_DATA:
+            for (i=0; i<500; i++) {
+              time_array[i] = millis();
+            }
+            Serial.println("Stored 500 time samples");
+            break;
+	</code>
+	
+	<p></p>
+	<code>
+        case SEND_TIME_DATA:
+            for (i=0; i<500; i++) {
+              tx_estring_value.clear();
+              tx_estring_value.append("T:");
+              tx_estring_value.append(time_array[i]);
+              tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            }
+            Serial.println("Sent 500 time samples");
+            break;
+	</code>
+	<p></p>
+	
+	<code>
+		ble.send_command(CMD.STORE_TIME_DATA, "")
+		ble.send_command(CMD.SEND_TIME_DATA, "")
+	</code>
+	<p></p>
+	
+	I then added the ability to capture the temerature reading into another array during the command STORE_TIME_DATA.  I made sure to capture the temperature reading right after storing each timestamp.  I also added a new command, GET_TEMP_READINGS, which has the Arduino send over the temperature readings with the timestamp for each reading.  In additioan, the notifican handle was modified to separate out each string into time and temperature and store them into arrays.  The Arduino and Jupyter code is below.
+	<p></p>
+	
+	<code>
+        case STORE_TIME_DATA:
+            for (i=0; i<500; i++) {
+              time_array[i] = millis();
+              temp_array[i] = getTempDegC();
+            }
+            Serial.println("Stored 500 time samples");
+            break;
+	</code>
+	<p></p>
+	
+	<code>
+    case GET_TEMP_READINGS:
+        for (i=0; i<500; i++) {
+          tx_estring_value.clear();
+          tx_estring_value.append("T:");
+          tx_estring_value.append(time_array[i]);
+          tx_estring_value.append(",C:");
+          tx_estring_value.append(temp_array[i]);
+          tx_characteristic_string.writeValue(tx_estring_value.c_str());
+        }
+        Serial.println("Sent 500 time and temp samples");
+        break;
+	</code>
+	<p></p>
+	
+	<code>
+		# Notification Handler
+		time_list = []
+		temp_list = []
+		def notification_handler(uuid, byte_array):
+		    time, temp = ble.bytearray_to_string(byte_array).split(',')
+		    time_list.append(time[2:])
+		    temp_list.append(temp[2:])
+
+		ble.start_notify(ble.uuid['RX_STRING'], notification_handler)
+		
+		ble.send_command(CMD.GET_TEMP_READINGS, "")
+	</code>
+	<p></p>
+
+		
 		
 	
 	
