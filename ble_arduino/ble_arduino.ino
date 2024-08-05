@@ -3,21 +3,24 @@
 #include "EString.h"
 #include "RobotCommand.h"
 #include <ArduinoBLE.h>
+#include "ICM_20948.h"
+
+// Defines for IMU
+#define SERIAL_PORT Serial
+#define WIRE_PORT Wire
+#define AD0_VAL 0
 
 //////////// BLE UUIDs ////////////
 #define BLE_UUID_TEST_SERVICE "fbaf56fb-a094-4bf5-b5b9-71571ba584a7"
-
-#define BLE_UUID_RX_STRING "9750f60b-9c9c-4158-b620-02ec9521cd99"
-
-#define BLE_UUID_TX_FLOAT "27616294-3063-4ecc-b60b-3470ddef2938"
-#define BLE_UUID_TX_STRING "f235a225-6735-4d73-94cb-ee5dfce9ba83"
+#define BLE_UUID_RX_STRING    "9750f60b-9c9c-4158-b620-02ec9521cd99"
+#define BLE_UUID_TX_FLOAT     "27616294-3063-4ecc-b60b-3470ddef2938"
+#define BLE_UUID_TX_STRING    "f235a225-6735-4d73-94cb-ee5dfce9ba83"
 //////////// BLE UUIDs ////////////
 
 //////////// Global Variables ////////////
 BLEService testService(BLE_UUID_TEST_SERVICE);
 
 BLECStringCharacteristic rx_characteristic_string(BLE_UUID_RX_STRING, BLEWrite, MAX_MSG_SIZE);
-
 BLEFloatCharacteristic tx_characteristic_float(BLE_UUID_TX_FLOAT, BLERead | BLENotify);
 BLECStringCharacteristic tx_characteristic_string(BLE_UUID_TX_STRING, BLERead | BLENotify, MAX_MSG_SIZE);
 
@@ -31,11 +34,11 @@ float tx_float_value = 0.0;
 long interval = 500;
 static long previousMillis = 0;
 unsigned long currentMillis = 0;
+
 //////////// Global Variables ////////////
 int i;
 int time_array[500];
 float temp_array[500];
-
 
 enum CommandTypes
 {
@@ -49,8 +52,23 @@ enum CommandTypes
     GET_TIME_MILLIS_LOOP,
     STORE_TIME_DATA,
     SEND_TIME_DATA,
-    GET_TEMP_READINGS
+    GET_TEMP_READINGS,
+    GET_ACCEL_DATA
 };
+
+// Create an I2C object for the IMU
+ICM_20948_I2C myICM;
+
+void
+blink3()
+{
+  for (i=0; i<3; i++) {
+    digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    delay(1000);                      // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
+    delay(1000);                      // wait for a second
+  }
+}
 
 void
 handle_command()
@@ -219,6 +237,18 @@ handle_command()
             Serial.println("Sent 500 time and temp samples");
             break;
 
+        case GET_ACCEL_DATA:
+            for (i=0; i<500; i++) {
+              tx_estring_value.clear();
+              tx_estring_value.append("T:");
+              tx_estring_value.append(time_array[i]);
+              tx_estring_value.append(",C:");
+              tx_estring_value.append(temp_array[i]);
+              tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            }
+            Serial.println("Sent 500 time and temp samples");
+            break;
+
         /* 
          * The default case may not capture all types of invalid commands.
          * It is safer to validate the command string on the central device (in python)
@@ -234,6 +264,10 @@ handle_command()
 void
 setup()
 {
+    // Blick the LED 3 times to indicate we are up and running
+    pinMode(LED_BUILTIN, OUTPUT);
+    blink3();
+
     Serial.begin(115200);
 
     BLE.begin();
@@ -250,6 +284,25 @@ setup()
 
     // Add BLE service
     BLE.addService(testService);
+
+    // IMU
+    WIRE_PORT.begin();
+    WIRE_PORT.setClock(400000);
+    bool initialized = false;
+
+    myICM.begin(WIRE_PORT, AD0_VAL);
+
+    SERIAL_PORT.print(F("Initialization of the sensor returned: "));
+    SERIAL_PORT.println(myICM.statusString());
+    if (myICM.status != ICM_20948_Stat_Ok)
+    {
+      SERIAL_PORT.println("Trying again...");
+      delay(500);
+    }
+    else
+    {
+      initialized = true;
+    }
 
     // Initial values for characteristics
     // Set initial values to prevent errors when reading for the first time on central devices
@@ -278,6 +331,7 @@ setup()
     Serial.println(BLE.address());
 
     BLE.advertise();
+
 }
 
 void
