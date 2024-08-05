@@ -4,6 +4,7 @@
 #include "RobotCommand.h"
 #include <ArduinoBLE.h>
 #include "ICM_20948.h"
+#include "math.h"
 
 // Defines for IMU
 #define SERIAL_PORT Serial
@@ -39,6 +40,9 @@ unsigned long currentMillis = 0;
 int i;
 int time_array[500];
 float temp_array[500];
+float ax, ay, az;
+float pitch, roll;
+
 
 enum CommandTypes
 {
@@ -285,7 +289,7 @@ setup()
     // Add BLE service
     BLE.addService(testService);
 
-    // IMU
+    // Set up IMU
     WIRE_PORT.begin();
     WIRE_PORT.setClock(400000);
     bool initialized = false;
@@ -303,6 +307,7 @@ setup()
     {
       initialized = true;
     }
+    // End IMU Setup
 
     // Initial values for characteristics
     // Set initial values to prevent errors when reading for the first time on central devices
@@ -383,4 +388,19 @@ loop()
 
         Serial.println("Disconnected");
     }
+
+    // Sample IMU accelerometer data
+    myICM.getAGMT();
+    ax = (float)myICM.accX();
+    ay = (float)myICM.accY();
+    az = (float)myICM.accZ();
+
+    pitch = atan2(ax, az) * 180 / M_PI;
+    roll  = atan2(ay, az) * 180 / M_PI;
+
+    Serial.print("Pitch: ");
+    Serial.print(pitch);
+    Serial.print(", Roll: ");
+    Serial.println(roll);
+
 }
