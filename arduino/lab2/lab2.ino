@@ -397,6 +397,19 @@ loop()
     pitch = atan2(ax, az) * 180 / M_PI;
     roll  = atan2(ay, az) * 180 / M_PI;
 
+    if (pitch < -90) {
+      pitch = pitch + 180;
+    }
+    if (pitch > 90) {
+      pitch = pitch - 180;
+    }
+    if (roll < -90) {
+      roll = roll + 180;
+    }
+    if (roll > 90) {
+      roll = roll - 180;
+    }
+
     Serial.print("Pitch: ");
     Serial.print(pitch);
     Serial.print(", Roll: ");
