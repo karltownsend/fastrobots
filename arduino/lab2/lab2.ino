@@ -41,7 +41,8 @@ int time_array[500];
 float temp_array[500];
 float ax, ay, az;
 float pitch, roll;
-
+float pitch_lpf1 = 0;
+float alpha = 1/16;
 
 enum CommandTypes
 {
@@ -410,7 +411,17 @@ loop()
       roll = roll - 180;
     }
 
-    Serial.print("Pitch: ");
+    if (pitch == 0) {
+      pitch = 0.1;
+    }
+    alpha = 15.0/16.0;
+    
+    pitch = alpha * pitch + (1 - alpha) * pitch_lpf1;
+    pitch_lpf1 = pitch;
+
+    Serial.print("Alpha: ");
+    Serial.print(alpha);
+    Serial.print(", Pitch: ");
     Serial.print(pitch);
     Serial.print(", Roll: ");
     Serial.println(roll);
