@@ -12,3 +12,4 @@ class CMD(Enum):
     STORE_TIME_DATA = 8
     SEND_TIME_DATA = 9
     GET_TEMP_READINGS = 10
+    GET_IMU_DATA = 11

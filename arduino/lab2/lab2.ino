@@ -37,12 +37,16 @@ unsigned long currentMillis = 0;
 
 //////////// Global Variables ////////////
 int i;
-int time_array[500];
-float temp_array[500];
-float ax, ay, az;
-float pitch, roll;
-float pitch_lpf1 = 0;
-float alpha = 1/16;
+long time_start, time_stamp, time_prev, cnt, period;
+float dt, alpha;
+#define data_size 2000
+int time_array[data_size];
+float temp_array[data_size];
+float pitch_a[data_size], roll_a[data_size];
+float pitch_a_lpf[data_size], roll_a_lpf[data_size];
+float pitch_g[data_size], roll_g[data_size], yaw_g[data_size];
+float pitch_g_lpf[data_size], roll_g_lpf[data_size], yaw_g_lpf[data_size];
+bool imu_ready;
 
 enum CommandTypes
 {
@@ -57,7 +61,7 @@ enum CommandTypes
     STORE_TIME_DATA,
     SEND_TIME_DATA,
     GET_TEMP_READINGS,
-    GET_ACCEL_DATA
+    GET_IMU_DATA
 };
 
 // Create an I2C object for the IMU
@@ -195,7 +199,6 @@ handle_command()
         
         case GET_TIME_MILLIS_LOOP:
 
-            long time_start, cnt;
             time_start = millis();
             cnt = 0;
             while (millis() - time_start < 2000) {
@@ -241,16 +244,123 @@ handle_command()
             Serial.println("Sent 500 time and temp samples");
             break;
 
-        case GET_ACCEL_DATA:
-            for (i=0; i<500; i++) {
+        case GET_IMU_DATA:
+
+            time_start = millis();
+
+            i = 0;
+
+            while (millis() - time_start < 5000)
+            {
+              if (myICM.dataReady())
+              {
+                time_array[i] = millis();
+                period = time_array[i]-time_array[i-1];
+                dt = period/1000.0;
+                alpha = period/(period+(1/(2*M_PI*5)));
+
+                myICM.getAGMT();            // The values are only updated when you call 'getAGMT'
+              
+              // Get the IMU accelerometer data
+
+                pitch_a[i] = atan2(myICM.accX(), myICM.accZ()) * 180 / M_PI;
+                roll_a[i]  = atan2(myICM.accY(), myICM.accZ()) * 180 / M_PI;
+
+              // process the accel data through a complimentary filter
+
+                if (i>0) {
+                  pitch_a_lpf[i] = alpha*pitch_a[i] + (1-alpha)*(pitch_a[i-1]);
+                  roll_a_lpf[i]  = alpha*roll_a[i]  + (1-alpha)*(roll_a[i-1]);
+                }
+                else {
+                  pitch_a_lpf[i] = pitch_a[i];
+                  roll_a_lpf[i]  = roll_a[i];
+                }
+
+/*
+                if (pitch_a[i] < -90) {
+                  pitch_a[i] = pitch_a[i] + 180;
+                }
+                if (pitch_a[i] > 90) {
+                  pitch_a[i] = pitch_a[i] - 180;
+                }
+                if (roll_a[i] < -90) {
+                  roll_a[i] = roll_a[i] + 180;
+                }
+                if (roll_a[i] > 90) {
+                  roll_a[i] = roll_a[i] - 180;
+                }
+*/
+
+              // Get the IMU gyro data
+
+                if (i>0) {
+                  roll_g[i]  = roll_g[i-1]  + myICM.gyrX()*dt;
+                  pitch_g[i] = pitch_g[i-1] + myICM.gyrY()*dt;
+                  yaw_g[i]   = yaw_g[i-1]   + myICM.gyrZ()*dt;
+                }
+                else {
+                  roll_g[i]  = myICM.gyrX()*dt;
+                  pitch_g[i] = myICM.gyrY()*dt;
+                  yaw_g[i]   = myICM.gyrZ()*dt;
+                }
+
+                if (i>0) {
+                  roll_g_lpf[i]  = (roll_g_lpf[i-1]  + roll_g[i])*(1-alpha)  + roll_a_lpf[i]*alpha;
+                  pitch_g_lpf[i] = (pitch_g_lpf[i-1] + pitch_g[i])*(1-alpha) + pitch_a_lpf[i]*alpha;
+                }
+                else {
+                  roll_g_lpf[i]  = (roll_g[i])*(1-alpha)  + roll_a_lpf[i]*alpha;
+                  pitch_g_lpf[i] = (pitch_g[i])*(1-alpha) + pitch_a_lpf[i]*alpha;
+                }
+                yaw_g_lpf[i]   =  yaw_g_lpf[i]   + yaw_g[i];
+
+              //  printPaddedInt16b(pitch_a[i]);
+              //  printPaddedInt16b(roll_a[i]);
+              //  Serial.println("");
+
+                  Serial.print(dt);
+                  printPaddedInt16b(roll_g_lpf[i]);
+                  printPaddedInt16b(pitch_g_lpf[i]);
+                  printPaddedInt16b(yaw_g_lpf[i]);
+                  Serial.println("");
+
+                // Increment the count
+                i++;
+
+              }
+            }
+            cnt = i;
+
+            Serial.print("IMU data collected, ");
+            Serial.print(cnt);
+            Serial.println(" samples");
+            Serial.print("Sending ");
+
+            time_start = millis();
+
+            for (i=0; i<=cnt; i++) {
               tx_estring_value.clear();
               tx_estring_value.append("T:");
               tx_estring_value.append(time_array[i]);
-              tx_estring_value.append(",C:");
-              tx_estring_value.append(temp_array[i]);
+              tx_estring_value.append(",RC:");
+              tx_estring_value.append(roll_g_lpf[i]);
+              tx_estring_value.append(",PC:");
+              tx_estring_value.append(pitch_g_lpf[i]);
+              tx_estring_value.append(",YC:");
+              tx_estring_value.append(yaw_g_lpf[i]);
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
-            }
-            Serial.println("Sent 500 time and temp samples");
+
+              if (i % 100 == 0) {
+                Serial.print(".");
+                }
+              }
+            
+            Serial.println(" Done!");
+            Serial.print("Total time: ");
+            Serial.print((millis() - time_start)/1000);
+            Serial.println(" seconds");
+
             break;
 
         /* 
@@ -350,7 +460,6 @@ write_data()
 
         if (tx_float_value > 10000) {
             tx_float_value = 0;
-            
         }
 
         previousMillis = currentMillis;
@@ -388,42 +497,21 @@ loop()
 
         Serial.println("Disconnected");
     }
+}
 
-    // Sample IMU accelerometer data
-    myICM.getAGMT();
-    ax = (float)myICM.accX();
-    ay = (float)myICM.accY();
-    az = (float)myICM.accZ();
-
-    pitch = atan2(ax, az) * 180 / M_PI;
-    roll  = atan2(ay, az) * 180 / M_PI;
-
-    if (pitch < -90) {
-      pitch = pitch + 180;
-    }
-    if (pitch > 90) {
-      pitch = pitch - 180;
-    }
-    if (roll < -90) {
-      roll = roll + 180;
-    }
-    if (roll > 90) {
-      roll = roll - 180;
-    }
-
-    if (pitch == 0) {
-      pitch = 0.1;
-    }
-    alpha = 15.0/16.0;
-    
-    pitch = alpha * pitch + (1 - alpha) * pitch_lpf1;
-    pitch_lpf1 = pitch;
-
-    Serial.print("Alpha: ");
-    Serial.print(alpha);
-    Serial.print(", Pitch: ");
-    Serial.print(pitch);
-    Serial.print(", Roll: ");
-    Serial.println(roll);
-
+void printPaddedInt16b( int16_t val ) {
+  if (val > 0) {
+    SERIAL_PORT.print(" ");
+    if(val < 10000){ SERIAL_PORT.print("0"); }
+    if(val < 1000 ){ SERIAL_PORT.print("0"); }
+    if(val < 100  ){ SERIAL_PORT.print("0"); }
+    if(val < 10   ){ SERIAL_PORT.print("0"); }
+  } else {
+    SERIAL_PORT.print("-");
+    if(abs(val) < 10000){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 1000 ){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 100  ){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 10   ){ SERIAL_PORT.print("0"); }
+  }
+  SERIAL_PORT.print(abs(val));
 }
