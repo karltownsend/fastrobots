@@ -256,21 +256,27 @@ handle_command()
               {
                 time_array[i] = millis();
                 period = time_array[i]-time_array[i-1];
-                dt = period/1000.0;
-                alpha = period/(period+(1/(2*M_PI*5)));
 
                 myICM.getAGMT();            // The values are only updated when you call 'getAGMT'
               
               // Get the IMU accelerometer data
+              //
+              // Pitch (theta) = atan2(ax, az)
+              // Roll (phi)    = atan2(ay, az)
 
                 pitch_a[i] = atan2(myICM.accX(), myICM.accZ()) * 180 / M_PI;
                 roll_a[i]  = atan2(myICM.accY(), myICM.accZ()) * 180 / M_PI;
 
               // process the accel data through a complimentary filter
 
+                // Cutoff frequency at 5 Hz
+                alpha = period/(period+(1/(2*M_PI*5)));
+
                 if (i>0) {
-                  pitch_a_lpf[i] = alpha*pitch_a[i] + (1-alpha)*(pitch_a[i-1]);
-                  roll_a_lpf[i]  = alpha*roll_a[i]  + (1-alpha)*(roll_a[i-1]);
+                  pitch_a_lpf[i]   = alpha*pitch_a[i] + (1-alpha)*(pitch_a_lpf[i-1]);
+                  pitch_a_lpf[i-1] = pitch_a_lpf[i];
+                  roll_a_lpf[i]    = alpha*roll_a[i]  + (1-alpha)*(roll_a_lpf[i-1]);
+                  roll_a_lpf[i-1]  = roll_a_lpf[i];
                 }
                 else {
                   pitch_a_lpf[i] = pitch_a[i];
@@ -291,13 +297,15 @@ handle_command()
                   roll_a[i] = roll_a[i] - 180;
                 }
 */
-
               // Get the IMU gyro data
 
+                // Make sure dt is in seconds!
+                dt = (float) period/1000.0;
+
                 if (i>0) {
-                  roll_g[i]  = roll_g[i-1]  + myICM.gyrX()*dt;
-                  pitch_g[i] = pitch_g[i-1] + myICM.gyrY()*dt;
-                  yaw_g[i]   = yaw_g[i-1]   + myICM.gyrZ()*dt;
+                  roll_g[i]  = roll_g[i-1]  - myICM.gyrX()*dt;
+                  pitch_g[i] = pitch_g[i-1] - myICM.gyrY()*dt;
+                  yaw_g[i]   = yaw_g[i-1]   - myICM.gyrZ()*dt;
                 }
                 else {
                   roll_g[i]  = myICM.gyrX()*dt;
