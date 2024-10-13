@@ -15,7 +15,7 @@
 #include<math.h>
 
 #define SERIAL_PORT Serial
-#define AD0_VAL   1     // The value of the last bit of the I2C address, on the SparkFun 9DoF IMU breakout the default is 1
+#define AD0_VAL   0     // The value of the last bit of the I2C address, on the SparkFun 9DoF IMU breakout the default is 1
 #define blinkPin LED_BUILTIN
 
 
@@ -97,9 +97,9 @@ void loop() {
       Serial.print(roll_g);
       Serial.print(", ");
       Serial.println(yaw_g);
-      Serial.print(", ");
-      pitch_a = atan2(myICM.accY(),myICM.accZ())*180/M_PI;
-      Serial.println(pitch_a);
+      //Serial.print(", ");
+      //pitch_a = atan2(myICM.accY(),myICM.accZ())*180/M_PI;
+      //Serial.println(pitch_a);
 
 /*
       //Slide 34, Gyroscope and Accelerometer

@@ -37,13 +37,16 @@ unsigned long currentMillis = 0;
 
 //////////// Global Variables ////////////
 int i;
-long time_start, time_stamp, time_prev, cnt, period;
-float dt, alpha;
+long time_start, time_now, time_stamp, time_prev, cnt, period;
+float dt, alpha, alpha_lpf;
 #define data_size 2000
 int time_array[data_size];
 float temp_array[data_size];
 float pitch_a[data_size], roll_a[data_size];
+float pitch_gyro, roll_gyro, yaw_gyro;
+float roll_comp = 0.0, pitch_comp = 0.0, yaw_comp = 0.0;
 float pitch_a_lpf[data_size], roll_a_lpf[data_size];
+float pitch_a_lpfi, pitch_a_lpfi1, roll_a_lpfi, roll_a_lpfi1;
 float pitch_g[data_size], roll_g[data_size], yaw_g[data_size];
 float pitch_g_lpf[data_size], roll_g_lpf[data_size], yaw_g_lpf[data_size];
 bool imu_ready;
@@ -72,9 +75,9 @@ blink3()
 {
   for (i=0; i<3; i++) {
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(1000);                      // wait for a second
+    delay(100);                      // wait for a second
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-    delay(1000);                      // wait for a second
+    delay(100);                      // wait for a second
   }
 }
 
@@ -246,16 +249,32 @@ handle_command()
 
         case GET_IMU_DATA:
 
-            time_start = millis();
+            Serial.println("Starting IMU collection");
 
             i = 0;
+
+            time_start = millis();
+            time_array[i]  = time_start;
+            roll_a[i]      = 0;
+            pitch_a[i]     = 0;
+            roll_a_lpf[i]  = 0;
+            pitch_a_lpf[i] = 0;
+            roll_g[i]      = 0;
+            pitch_g[i]     = 0;
+            yaw_g[i]       = 0;
+            roll_g_lpf[i]  = 0;
+            pitch_g_lpf[i] = 0;
+            yaw_g_lpf[i]   = 0;
+
+            i = 1;
+
+            
 
             while (millis() - time_start < 5000)
             {
               if (myICM.dataReady())
               {
                 time_array[i] = millis();
-                period = time_array[i]-time_array[i-1];
 
                 myICM.getAGMT();            // The values are only updated when you call 'getAGMT'
               
@@ -267,82 +286,38 @@ handle_command()
                 pitch_a[i] = atan2(myICM.accX(), myICM.accZ()) * 180 / M_PI;
                 roll_a[i]  = atan2(myICM.accY(), myICM.accZ()) * 180 / M_PI;
 
-              // process the accel data through a complimentary filter
+                alpha_lpf = 0.1;
+                pitch_a_lpf[i]   = alpha_lpf * pitch_a[i] + (1-alpha_lpf) * pitch_a_lpf[i-1]; 
+                roll_a_lpf[i]    = alpha_lpf * roll_a[i]  + (1-alpha_lpf) * roll_a_lpf[i-1]; 
+                pitch_a_lpf[i-1] = pitch_a_lpf[i]; 
+                roll_a_lpf[i-1]  = roll_a_lpf[i]; 
 
-                // Cutoff frequency at 5 Hz
-                alpha = period/(period+(1/(2*M_PI*5)));
+              // Make sure dt is in seconds!
+                dt = (time_array[i]-time_array[i-1])/1000.0;
+                alpha = 0.01;
 
-                if (i>0) {
-                  pitch_a_lpf[i]   = alpha*pitch_a[i] + (1-alpha)*(pitch_a_lpf[i-1]);
-                  pitch_a_lpf[i-1] = pitch_a_lpf[i];
-                  roll_a_lpf[i]    = alpha*roll_a[i]  + (1-alpha)*(roll_a_lpf[i-1]);
-                  roll_a_lpf[i-1]  = roll_a_lpf[i];
-                }
-                else {
-                  pitch_a_lpf[i] = pitch_a[i];
-                  roll_a_lpf[i]  = roll_a[i];
-                }
-
-/*
-                if (pitch_a[i] < -90) {
-                  pitch_a[i] = pitch_a[i] + 180;
-                }
-                if (pitch_a[i] > 90) {
-                  pitch_a[i] = pitch_a[i] - 180;
-                }
-                if (roll_a[i] < -90) {
-                  roll_a[i] = roll_a[i] + 180;
-                }
-                if (roll_a[i] > 90) {
-                  roll_a[i] = roll_a[i] - 180;
-                }
-*/
               // Get the IMU gyro data
+                roll_g[i]  = roll_g[i-1]  + myICM.gyrX()*dt;
+                pitch_g[i] = pitch_g[i-1] + myICM.gyrY()*dt;
+                yaw_g[i]   = yaw_g[i-1]   + myICM.gyrZ()*dt;
 
-                // Make sure dt is in seconds!
-                dt = (float) period/1000.0;
-
-                if (i>0) {
-                  roll_g[i]  = roll_g[i-1]  - myICM.gyrX()*dt;
-                  pitch_g[i] = pitch_g[i-1] - myICM.gyrY()*dt;
-                  yaw_g[i]   = yaw_g[i-1]   - myICM.gyrZ()*dt;
-                }
-                else {
-                  roll_g[i]  = myICM.gyrX()*dt;
-                  pitch_g[i] = myICM.gyrY()*dt;
-                  yaw_g[i]   = myICM.gyrZ()*dt;
-                }
-
-                if (i>0) {
-                  roll_g_lpf[i]  = (roll_g_lpf[i-1]  + roll_g[i])*(1-alpha)  + roll_a_lpf[i]*alpha;
-                  pitch_g_lpf[i] = (pitch_g_lpf[i-1] + pitch_g[i])*(1-alpha) + pitch_a_lpf[i]*alpha;
-                }
-                else {
-                  roll_g_lpf[i]  = (roll_g[i])*(1-alpha)  + roll_a_lpf[i]*alpha;
-                  pitch_g_lpf[i] = (pitch_g[i])*(1-alpha) + pitch_a_lpf[i]*alpha;
-                }
-                yaw_g_lpf[i]   =  yaw_g_lpf[i]   + yaw_g[i];
-
-              //  printPaddedInt16b(pitch_a[i]);
-              //  printPaddedInt16b(roll_a[i]);
-              //  Serial.println("");
-
-                  Serial.print(dt);
-                  printPaddedInt16b(roll_g_lpf[i]);
-                  printPaddedInt16b(pitch_g_lpf[i]);
-                  printPaddedInt16b(yaw_g_lpf[i]);
-                  Serial.println("");
+                //roll_g_lpf[i]  = (1 - alpha) * (roll_g_lpf[i-1]  + roll_g[i])  + alpha * roll_a_lpf[i];
+                //pitch_g_lpf[i] = (1 - alpha) * (pitch_g_lpf[i-1] + pitch_g[i]) + alpha * pitch_a_lpf[i];
+                roll_g_lpf[i]  = (1 - alpha) * (roll_g_lpf[i-1]  + myICM.gyrX()*dt)  + alpha * roll_a_lpf[i];
+                pitch_g_lpf[i] = (1 - alpha) * (pitch_g_lpf[i-1] + myICM.gyrY()*dt) + alpha * pitch_a_lpf[i];
+                yaw_g_lpf[i]   = yaw_g_lpf[i]   + yaw_g[i];
 
                 // Increment the count
                 i++;
-
               }
             }
             cnt = i;
 
             Serial.print("IMU data collected, ");
             Serial.print(cnt);
-            Serial.println(" samples");
+            Serial.print(" samples in 5 sec, ");
+            Serial.print(5000.0/cnt);
+            Serial.println(" ms each.");
             Serial.print("Sending ");
 
             time_start = millis();
@@ -351,12 +326,31 @@ handle_command()
               tx_estring_value.clear();
               tx_estring_value.append("T:");
               tx_estring_value.append(time_array[i]);
+
+              tx_estring_value.append(",RA:");
+              tx_estring_value.append(roll_a[i]);
+              tx_estring_value.append(",PA:");
+              tx_estring_value.append(pitch_a[i]);
+
+              tx_estring_value.append(",RL:");
+              tx_estring_value.append(roll_a_lpf[i]);
+              tx_estring_value.append(",PL:");
+              tx_estring_value.append(pitch_a_lpf[i]);
+
+              tx_estring_value.append(",RG:");
+              tx_estring_value.append(roll_g[i]);
+              tx_estring_value.append(",PG:");
+              tx_estring_value.append(pitch_g[i]);
+              tx_estring_value.append(",YG:");
+              tx_estring_value.append(yaw_g[i]);
+
               tx_estring_value.append(",RC:");
               tx_estring_value.append(roll_g_lpf[i]);
               tx_estring_value.append(",PC:");
               tx_estring_value.append(pitch_g_lpf[i]);
               tx_estring_value.append(",YC:");
               tx_estring_value.append(yaw_g_lpf[i]);
+
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
               if (i % 100 == 0) {
@@ -366,7 +360,7 @@ handle_command()
             
             Serial.println(" Done!");
             Serial.print("Total time: ");
-            Serial.print((millis() - time_start)/1000);
+            Serial.print((millis() - time_start)/1000.0);
             Serial.println(" seconds");
 
             break;
@@ -414,7 +408,7 @@ setup()
 
     myICM.begin(WIRE_PORT, AD0_VAL);
 
-    SERIAL_PORT.print(F("Initialization of the sensor returned: "));
+    SERIAL_PORT.print(F("\n\nInitialization of the sensor returned: "));
     SERIAL_PORT.println(myICM.statusString());
     if (myICM.status != ICM_20948_Stat_Ok)
     {
@@ -455,6 +449,20 @@ setup()
 
     BLE.advertise();
 
+    ICM_20948_fss_t myFSS;
+    myFSS.a = gpm2;
+    myFSS.g = dps1000;
+//    Serial.print("myFSS.a: ");
+//    Serial.println(myFSS.a);
+//    Serial.print("myFSS.g: ");
+//    Serial.println(myFSS.g);
+
+    myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
+    if (myICM.status != ICM_20948_Stat_Ok) {
+      SERIAL_PORT.print(F("setFullScale returned: "));
+      SERIAL_PORT.println(myICM.statusString());
+      }
+
 }
 
 void
@@ -486,7 +494,8 @@ read_data()
 void
 loop()
 {
-    // Listen for connections
+
+// Listen for connections
     BLEDevice central = BLE.central();
 
     // If a central is connected to the peripheral
@@ -501,8 +510,8 @@ loop()
 
             // Read data
             read_data();
-        }
 
+        }
         Serial.println("Disconnected");
     }
 }
