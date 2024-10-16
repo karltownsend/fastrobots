@@ -3,6 +3,7 @@
 #include "/Users/karlt/Documents/GitHub/fastrobots/arduino/RobotCommand.h"
 #include <ArduinoBLE.h>
 #include <ICM_20948.h>
+#include "SparkFun_VL53L1X.h" //Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X
 #include <math.h>
 
 // Defines for IMU
@@ -70,14 +71,19 @@ enum CommandTypes
 // Create an I2C object for the IMU
 ICM_20948_I2C myICM;
 
+// Distance Sensor
+SFEVL53L1X distanceSensor;
+//Uncomment the following line to use the optional shutdown and interrupt pins.
+//SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);
+
 void
 blink3()
 {
   for (i=0; i<3; i++) {
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(100);                      // wait for a second
+    delay(500);                      // wait for a second
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-    delay(100);                      // wait for a second
+    delay(500);                      // wait for a second
   }
 }
 
@@ -305,7 +311,8 @@ handle_command()
                 //pitch_g_lpf[i] = (1 - alpha) * (pitch_g_lpf[i-1] + pitch_g[i]) + alpha * pitch_a_lpf[i];
                 roll_g_lpf[i]  = (1 - alpha) * (roll_g_lpf[i-1]  + myICM.gyrX()*dt)  + alpha * roll_a_lpf[i];
                 pitch_g_lpf[i] = (1 - alpha) * (pitch_g_lpf[i-1] + myICM.gyrY()*dt) + alpha * pitch_a_lpf[i];
-                yaw_g_lpf[i]   = yaw_g_lpf[i]   + yaw_g[i];
+//                yaw_g_lpf[i]   = yaw_g_lpf[i]   + yaw_g[i];
+                yaw_g_lpf[i]   = yaw_g_lpf[i]   + myICM.gyrZ()*dt;
 
                 // Increment the count
                 i++;
@@ -383,6 +390,15 @@ setup()
     // Blick the LED 3 times to indicate we are up and running
     pinMode(LED_BUILTIN, OUTPUT);
     blink3();
+
+    pinMode(2, OUTPUT);
+    analogWrite(2, 25);
+    pinMode(3, OUTPUT);
+    analogWrite(3, 50);
+    pinMode(4, OUTPUT);
+    analogWrite(4, 100);
+    pinMode(5, OUTPUT);
+    analogWrite(5, 128);
 
     Serial.begin(115200);
 
@@ -463,6 +479,15 @@ setup()
       SERIAL_PORT.println(myICM.statusString());
       }
 
+    if (distanceSensor.begin() != 0) //Begin returns 0 on a good init
+    {
+      Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
+      while (1)
+        ;
+    }
+    Serial.println("Sensor online!");
+
+
 }
 
 void
@@ -514,6 +539,28 @@ loop()
         }
         Serial.println("Disconnected");
     }
+
+  // read from the ToF sensor and print to the console
+  distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
+  while (!distanceSensor.checkForDataReady())
+  {
+    delay(1);
+  }
+  int distance = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+  distanceSensor.clearInterrupt();
+  distanceSensor.stopRanging();
+
+  Serial.print("Distance(mm): ");
+  Serial.print(distance);
+
+  float distanceInches = distance * 0.0393701;
+  float distanceFeet = distanceInches / 12.0;
+
+  Serial.print("\tDistance(ft): ");
+  Serial.print(distanceFeet, 2);
+
+  Serial.println();
+
 }
 
 void printPaddedInt16b( int16_t val ) {
