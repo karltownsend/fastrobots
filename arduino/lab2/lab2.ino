@@ -65,7 +65,8 @@ enum CommandTypes
     STORE_TIME_DATA,
     SEND_TIME_DATA,
     GET_TEMP_READINGS,
-    GET_IMU_DATA
+    GET_IMU_DATA,
+    SET_PWM
 };
 
 // Create an I2C object for the IMU
@@ -76,9 +77,10 @@ SFEVL53L1X distanceSensor;
 //Uncomment the following line to use the optional shutdown and interrupt pins.
 //SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);
 
-void
-blink3()
-{
+// Motor Drivers
+//Cdrv8833 LeftMotor(2, 3, CHANNEL, SWAP);
+
+void blink3() {
   for (i=0; i<3; i++) {
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
     delay(500);                      // wait for a second
@@ -87,9 +89,7 @@ blink3()
   }
 }
 
-void
-handle_command()
-{   
+void handle_command() {   
     // Set the command string from the characteristic value
     robot_cmd.set_cmd_string(rx_characteristic_string.value(),
                              rx_characteristic_string.valueLength());
@@ -257,24 +257,20 @@ handle_command()
 
             Serial.println("Starting IMU collection");
 
-            i = 0;
-
             time_start = millis();
-            time_array[i]  = time_start;
-            roll_a[i]      = 0;
-            pitch_a[i]     = 0;
-            roll_a_lpf[i]  = 0;
-            pitch_a_lpf[i] = 0;
-            roll_g[i]      = 0;
-            pitch_g[i]     = 0;
-            yaw_g[i]       = 0;
-            roll_g_lpf[i]  = 0;
-            pitch_g_lpf[i] = 0;
-            yaw_g_lpf[i]   = 0;
+            time_array[0]  = time_start;
+            roll_a[0]      = 0;
+            pitch_a[0]     = 0;
+            roll_a_lpf[0]  = 0;
+            pitch_a_lpf[0] = 0;
+            roll_g[0]      = 0;
+            pitch_g[0]     = 0;
+            yaw_g[0]       = 0;
+            roll_g_lpf[0]  = 0;
+            pitch_g_lpf[0] = 0;
+            yaw_g_lpf[0]   = 0;
 
             i = 1;
-
-            
 
             while (millis() - time_start < 5000)
             {
@@ -372,6 +368,47 @@ handle_command()
 
             break;
 
+        case SET_PWM:
+
+            int pwm_a, pwm_b, pwm_c, pwm_d, pwm_delay;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(pwm_a);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(pwm_b);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(pwm_c);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(pwm_d);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(pwm_delay);
+            if (!success)
+                return;
+
+            analogWrite(3, pwm_a);  
+            analogWrite(4, pwm_b);
+            analogWrite(5, pwm_d);
+            analogWrite(6, pwm_c);
+            delay(pwm_delay);
+            analogWrite(3, LOW);  
+            analogWrite(4, LOW);
+            analogWrite(5, LOW);
+            analogWrite(6, LOW);
+
+            break;
+
         /* 
          * The default case may not capture all types of invalid commands.
          * It is safer to validate the command string on the central device (in python)
@@ -384,23 +421,24 @@ handle_command()
     }
 }
 
-void
-setup()
-{
-    // Blick the LED 3 times to indicate we are up and running
+void setup() {
+    // Setup serial monitor
+    Serial.begin(115200);
+
+    // Blink the LED 3 times to indicate we are up and running
     pinMode(LED_BUILTIN, OUTPUT);
     blink3();
 
-    pinMode(2, OUTPUT);
-    analogWrite(2, 25);
+    // Set up motor driver
+    Serial.println("Setting motor PWM to 0%");
     pinMode(3, OUTPUT);
-    analogWrite(3, 50);
     pinMode(4, OUTPUT);
-    analogWrite(4, 100);
     pinMode(5, OUTPUT);
-    analogWrite(5, 128);
-
-    Serial.begin(115200);
+    pinMode(6, OUTPUT);
+    analogWrite(3, LOW);  
+    analogWrite(4, LOW);
+    analogWrite(5, LOW);
+    analogWrite(6, LOW);
 
     BLE.begin();
 
@@ -434,6 +472,8 @@ setup()
     else
     {
       initialized = true;
+      Serial.println("IMU Sensor online!");
+
     }
     // End IMU Setup
 
@@ -485,14 +525,10 @@ setup()
       while (1)
         ;
     }
-    Serial.println("Sensor online!");
-
-
+    Serial.println("ToF Sensor online!");
 }
 
-void
-write_data()
-{
+void write_data() {
     currentMillis = millis();
     if (currentMillis - previousMillis > interval) {
 
@@ -507,20 +543,16 @@ write_data()
     }
 }
 
-void
-read_data()
-{
+void read_data() {
     // Query if the characteristic value has been written by another BLE device
     if (rx_characteristic_string.written()) {
         handle_command();
     }
 }
 
-void
-loop()
-{
+void loop() {
 
-// Listen for connections
+    // Listen for connections
     BLEDevice central = BLE.central();
 
     // If a central is connected to the peripheral
@@ -540,6 +572,7 @@ loop()
         Serial.println("Disconnected");
     }
 
+  /*
   // read from the ToF sensor and print to the console
   distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
   while (!distanceSensor.checkForDataReady())
@@ -560,7 +593,7 @@ loop()
   Serial.print(distanceFeet, 2);
 
   Serial.println();
-
+*/
 }
 
 void printPaddedInt16b( int16_t val ) {

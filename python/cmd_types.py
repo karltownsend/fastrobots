@@ -13,3 +13,4 @@ class CMD(Enum):
     SEND_TIME_DATA = 9
     GET_TEMP_READINGS = 10
     GET_IMU_DATA = 11
+    SET_PWM = 12
