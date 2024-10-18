@@ -72,20 +72,16 @@ enum CommandTypes
 // Create an I2C object for the IMU
 ICM_20948_I2C myICM;
 
-// Distance Sensor
-SFEVL53L1X distanceSensor;
-//Uncomment the following line to use the optional shutdown and interrupt pins.
-//SFEVL53L1X distanceSensor(Wire, SHUTDOWN_PIN, INTERRUPT_PIN);
-
-// Motor Drivers
-//Cdrv8833 LeftMotor(2, 3, CHANNEL, SWAP);
+// Distance Sensors
+SFEVL53L1X sideTOF;
+SFEVL53L1X frontTOF;
 
 void blink3() {
   for (i=0; i<3; i++) {
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
-    delay(500);                      // wait for a second
+    delay(500);                       // wait for a half second
     digitalWrite(LED_BUILTIN, LOW);   // turn the LED off by making the voltage LOW
-    delay(500);                      // wait for a second
+    delay(500);                       // wait for a half second
   }
 }
 
@@ -402,10 +398,7 @@ void handle_command() {
             analogWrite(5, pwm_d);
             analogWrite(6, pwm_c);
             delay(pwm_delay);
-            analogWrite(3, LOW);  
-            analogWrite(4, LOW);
-            analogWrite(5, LOW);
-            analogWrite(6, LOW);
+            full_stop();
 
             break;
 
@@ -428,17 +421,6 @@ void setup() {
     // Blink the LED 3 times to indicate we are up and running
     pinMode(LED_BUILTIN, OUTPUT);
     blink3();
-
-    // Set up motor driver
-    Serial.println("Setting motor PWM to 0%");
-    pinMode(3, OUTPUT);
-    pinMode(4, OUTPUT);
-    pinMode(5, OUTPUT);
-    pinMode(6, OUTPUT);
-    analogWrite(3, LOW);  
-    analogWrite(4, LOW);
-    analogWrite(5, LOW);
-    analogWrite(6, LOW);
 
     BLE.begin();
 
@@ -477,6 +459,14 @@ void setup() {
     }
     // End IMU Setup
 
+  // Set up motor driver
+      Serial.println("Intializing motor drivers");
+      pinMode(3, OUTPUT);
+      pinMode(4, OUTPUT);
+      pinMode(5, OUTPUT);
+      pinMode(6, OUTPUT);
+      full_stop();
+
     // Initial values for characteristics
     // Set initial values to prevent errors when reading for the first time on central devices
     tx_characteristic_float.writeValue(0.0);
@@ -508,10 +498,6 @@ void setup() {
     ICM_20948_fss_t myFSS;
     myFSS.a = gpm2;
     myFSS.g = dps1000;
-//    Serial.print("myFSS.a: ");
-//    Serial.println(myFSS.a);
-//    Serial.print("myFSS.g: ");
-//    Serial.println(myFSS.g);
 
     myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
     if (myICM.status != ICM_20948_Stat_Ok) {
@@ -519,13 +505,37 @@ void setup() {
       SERIAL_PORT.println(myICM.statusString());
       }
 
-    if (distanceSensor.begin() != 0) //Begin returns 0 on a good init
+    // Set up TOF sensors
+    // Shut down front sensor
+    pinMode(7, OUTPUT);
+    digitalWrite(7, LOW);  
+
+// Display the SideTOF I2C address then change its address
+    SERIAL_PORT.print("Initial sideTOF I2C address: ");
+    SERIAL_PORT.println(sideTOF.getI2CAddress());
+    sideTOF.setI2CAddress(0x54);
+    SERIAL_PORT.print("Changed sideTOF I2C address to: ");
+    SERIAL_PORT.println(sideTOF.getI2CAddress());
+
+    // Enable Front sensor
+    digitalWrite(7, HIGH);
+    delay(500);
+    SERIAL_PORT.print("Initial frontTOF I2C address: ");
+    SERIAL_PORT.println(frontTOF.getI2CAddress());
+
+    if (sideTOF.begin() != 0) //Begin returns 0 on a good init
     {
-      Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
+      Serial.println("Side Sensor failed to begin. Please check wiring. Freezing...");
       while (1)
         ;
     }
-    Serial.println("ToF Sensor online!");
+    if (frontTOF.begin() != 0) //Begin returns 0 on a good init
+    {
+      Serial.println("Side Sensor failed to begin. Please check wiring. Freezing...");
+      while (1)
+        ;
+    }
+    Serial.println("ToF Sensors online!");
 }
 
 void write_data() {
@@ -550,6 +560,14 @@ void read_data() {
     }
 }
 
+void full_stop() {
+    // Stop the car, turn off the motor drivers
+      analogWrite(3, LOW);  
+      analogWrite(4, LOW);
+      analogWrite(5, LOW);
+      analogWrite(6, LOW);
+}
+
 void loop() {
 
     // Listen for connections
@@ -567,33 +585,40 @@ void loop() {
 
             // Read data
             read_data();
-
         }
+        full_stop();
         Serial.println("Disconnected");
     }
 
-  /*
-  // read from the ToF sensor and print to the console
-  distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
-  while (!distanceSensor.checkForDataReady())
+
+  // read from the ToF sensors and print to the console
+  sideTOF.startRanging(); //Write configuration bytes to initiate measurement
+  while (!sideTOF.checkForDataReady())
   {
     delay(1);
   }
-  int distance = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-  distanceSensor.clearInterrupt();
-  distanceSensor.stopRanging();
+  int side_dist = sideTOF.getDistance(); //Get the result of the measurement from the sensor
+  sideTOF.clearInterrupt();
+  sideTOF.stopRanging();
 
-  Serial.print("Distance(mm): ");
-  Serial.print(distance);
+  Serial.print("Side Distance(mm): ");
+  Serial.print(side_dist);
 
-  float distanceInches = distance * 0.0393701;
-  float distanceFeet = distanceInches / 12.0;
+  frontTOF.startRanging(); //Write configuration bytes to initiate measurement
 
-  Serial.print("\tDistance(ft): ");
-  Serial.print(distanceFeet, 2);
+  while (!frontTOF.checkForDataReady())
+  {
+    delay(1);
+  }
+  int front_dist = frontTOF.getDistance(); //Get the result of the measurement from the sensor
+  frontTOF.clearInterrupt();
+  frontTOF.stopRanging();
+
+  Serial.print("    Front Distance(mm): ");
+  Serial.print(front_dist);
 
   Serial.println();
-*/
+
 }
 
 void printPaddedInt16b( int16_t val ) {
