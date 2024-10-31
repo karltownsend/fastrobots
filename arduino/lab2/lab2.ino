@@ -51,10 +51,10 @@ float pitch_a_lpfi, pitch_a_lpfi1, roll_a_lpfi, roll_a_lpfi1;
 float pitch_g[data_size], roll_g[data_size], yaw_g[data_size];
 float pitch_g_lpf[data_size], roll_g_lpf[data_size], yaw_g_lpf[data_size];
 bool imu_ready;
-float fdist[data_size], sdist[data_size], motor_pwm[data_size];
-float kp=0.1, ki=0.0, kd=0.0, pid_out;
-int pid_max = 50;
-
+float fdist[data_size], sdist[data_size], pid[data_size], motor_pwm[data_size];
+float kp=0.01, ki=0.0, kd=0.0, pid_out=100;
+int pid_max = 100, deadzone = 30;
+float P[data_size], I[data_size], D[data_size];
 
 enum CommandTypes
 {
@@ -413,51 +413,81 @@ void handle_command() {
         case GO_WALL:
 
           // Init variables
-          #define motor_speed 90
-          #define max_time 10000
-          #define wall_dist 305   // 1 foot = 305 mm
-          float robot_dist, front_dist, prev_dist;
-          front_dist = 99999.0;
-          prev_dist = 99999.0;
+          #define max_time 8000
+          #define wall_dist 305 * 1.5   // 1 foot = 305 mm
+          float front_dist, prev_dist;
+          float dist_neg2, dist_neg1;
+          int time_neg2, time_neg1;
+          float slope;
           int pwm_value;
           time_start = millis();
-          float error, errSum, delta;
+          float error, errSum, delta, prev_error;
           errSum = 0.0;
+          prev_error = 0.0;
 
-          Serial.println("Start GO_WALL routine");
+          // get one range value before we start the car
+          dist_neg2 = getFrontTOF();
+          time_neg2 = millis();
 
-          // Start motors
-          pwm_value = motor_speed;
-          analogWrite(3, pwm_value);  
-          analogWrite(4, 0);
-          analogWrite(6, pwm_value);
-          analogWrite(5, 0);
+          // Start the car
+          pwm_value = setMotorspeed(50);
 
-          time_now = millis();
+          // get a second range value
+          dist_neg1 = getFrontTOF();
+          time_neg1 = millis();
+          // start new ranging
+          frontTOF.startRanging();
+
+          time_prev = time_neg2;
+          time_now = time_neg1;
+          dt = time_prev - time_now;
           i=0;
 
-          // Loop while we are still greater than 1 foot away from wall
-          //while ((front_dist > wall_dist) and time_now < (time_start + max_time)) {
+          // Loop until we run out of time
           while (time_now < (time_start + max_time)) {
 
-            // check ToF distance
-            frontTOF.startRanging();
-            while (!frontTOF.checkForDataReady())
-              {
-                delay(1);
-              }
-            front_dist = frontTOF.getDistance();
-            frontTOF.clearInterrupt();
-            frontTOF.stopRanging();
-            time_prev = time_now;
+            // get new range value if ready
+            if (frontTOF.checkForDataReady()) {
+              front_dist = frontTOF.getDistance();
+              frontTOF.clearInterrupt();
+              frontTOF.stopRanging();
 
+              // start new ranging
+              frontTOF.startRanging();
+
+              // update previous distance and time
+              dist_neg2 = dist_neg1;
+              dist_neg1 = front_dist;
+              time_neg2 = time_neg1;
+              time_neg1 = time_now;
+
+            } else {
+              // do an extrapolation based on last 2 ToF values
+              slope = (dist_neg2 - dist_neg1) / (time_neg2 - time_neg1);
+              front_dist = dist_neg1 - slope * (time_neg1 - time_now);
+            }
+
+            // PID Controller
             // Compute all the working error variables
-            error = front_dist - wall_dist;
-            errSum += error;
-            delta = prev_dist - front_dist;
+            error   = front_dist - wall_dist;
+            errSum += error * dt;
+            delta   = (error - prev_error) * dt;
+
+            // correct for large integral erros and wind-up
+            if (abs(error) < 0.1) {
+              errSum = 0;
+            }
+            // reset errSum if error is greatean than 2 feet or 600 mm
+            if (abs(error) > 600) {
+              errSum = 0;
+            }
+            
+            P[i] = error;
+            I[i] = errSum;
+            D[i] = delta;
 
             // Calculate PID output
-            pid_out = kp * error + ki * errSum - kd * delta; 
+            pid_out = kp * error + ki * errSum + kd * delta; 
             if (pid_out > 100) {
               pid_out = 100;
             } else if (pid_out < -100) {
@@ -465,59 +495,36 @@ void handle_command() {
             }
             pid_out = pid_out * pid_max/100;
 
-            // update pwm value
-            if (pid_out > 0) {
-              pwm_value = 60 + pid_out * (255-60)/100;
-              analogWrite(3, pwm_value);  
-              analogWrite(4, 0);
-              analogWrite(6, pwm_value);
-              analogWrite(5, 0);
-            } else {
-              pwm_value = -60 + pid_out * (255-60)/100;
-              analogWrite(4, pwm_value);  
-              analogWrite(3, 0);
-              analogWrite(5, pwm_value);
-              analogWrite(6, 0);
-            }
+            pwm_value = setMotorspeed(pid_out);
 
-            Serial.print("Dist: ");
-            Serial.print(front_dist);
-            Serial.print("  Diff: ");
-            Serial.print(error);
-            Serial.print("  PID: ");
-            Serial.print(pid_out);
-            Serial.print("  PWM: ");
-            Serial.println(pwm_value);
-
-            // collect data into arrays
+            // store data into arrays
             time_array[i] = time_now;
             fdist[i] = front_dist;
-            motor_pwm[i] = pid_out;
+            pid[i] = pid_out;
+            motor_pwm[i] = pwm_value;
 
-            // update loop variable
+            // update loop variables
             i++;
             prev_dist = front_dist;
+            time_prev = time_now;
             time_now = millis();
-
+            dt = time_prev - time_now;
+            prev_error = error;
           }    
 
+          //end loop, stop motors and ToF sensor
           cnt = i;
-          Serial.print("Time: ");
-          Serial.print(time_now-time_start);
-          Serial.print("  Count: ");
-          Serial.print(cnt);
-          Serial.print("  Front Distance: ");
-          Serial.println(front_dist);
-
-          //end loop, stop motors
           full_stop();
-          Serial.println("Stop motor");
+          frontTOF.clearInterrupt();
+          frontTOF.stopRanging();
 
           break;
 
         case GET_WALL_DATA:
 
           Serial.println("Sending wall data");
+
+          time_start = millis();
 
           for (i=0; i<=cnt; i++) {
             tx_estring_value.clear();
@@ -526,8 +533,16 @@ void handle_command() {
 
             tx_estring_value.append(",RA:");
             tx_estring_value.append(fdist[i]);
+            tx_estring_value.append(",PD:");
+            tx_estring_value.append(pid[i]);
             tx_estring_value.append(",PW:");
             tx_estring_value.append(motor_pwm[i]);
+            tx_estring_value.append(",KP:");
+            tx_estring_value.append(P[i]);
+            tx_estring_value.append(",KI:");
+            tx_estring_value.append(I[i]);
+            tx_estring_value.append(",KD:");
+            tx_estring_value.append(D[i]);
 
             tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
@@ -545,7 +560,8 @@ void handle_command() {
 
         case SET_PID_MAX:
 
-            float a, b, c, d;
+            float a, b, c;
+            int d, e;
 
             // Extract the next value from the command string as an integer
             success = robot_cmd.get_next_value(a);
@@ -567,10 +583,40 @@ void handle_command() {
             if (!success)
                 return;
 
-            kp = a;
-            ki = b;
-            kd = c;
-            pid_max = d;
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(e);
+            if (!success)
+                return;
+
+            kp = float(a);
+            ki = float(b);
+            kd = float(c);
+            pid_max = int(d);
+            deadzone = int(e);
+
+            Serial.print("Kp: ");
+            Serial.print(kp);
+            Serial.print("  Ki: ");
+            Serial.print(ki);
+            Serial.print("  Kd: ");
+            Serial.print(kd);
+            Serial.print("  PID_MAX: ");
+            Serial.print(pid_max);
+            Serial.print("  DEADZONE: ");
+            Serial.println(deadzone);
+
+            tx_estring_value.clear();
+            tx_estring_value.append("KP:");
+            tx_estring_value.append(kp);
+            tx_estring_value.append(" KI:");
+            tx_estring_value.append(ki);
+            tx_estring_value.append(" KD:");
+            tx_estring_value.append(kd);
+            tx_estring_value.append(" PID_MAX:");
+            tx_estring_value.append(pid_max);
+            tx_estring_value.append(" DEADZONE:");
+            tx_estring_value.append(deadzone);
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
             break;
 
@@ -589,10 +635,6 @@ void handle_command() {
 void setup() {
     // Setup serial monitor
     Serial.begin(115200);
-
-    // Blink the LED 3 times to indicate we are up and running
-    pinMode(LED_BUILTIN, OUTPUT);
-    blink3();
 
     BLE.begin();
 
@@ -616,31 +658,28 @@ void setup() {
 
     myICM.begin(WIRE_PORT, AD0_VAL);
 
-    SERIAL_PORT.print(F("\n\nInitialization of the sensor returned: "));
-    SERIAL_PORT.println(myICM.statusString());
+    Serial.print(F("\n\nInitialization of the IMU returned: "));
+    Serial.println(myICM.statusString());
     if (myICM.status != ICM_20948_Stat_Ok)
     {
-      SERIAL_PORT.println("Trying again...");
+      Serial.println("Trying again...");
       delay(500);
-    }
-    else
-    {
+    } else {
       initialized = true;
       Serial.println("IMU Sensor online!");
-
     }
     // End IMU Setup
 
-  // Set up motor driver
-      Serial.println("Intializing motor drivers");
-      pinMode(3, OUTPUT);
-      pinMode(4, OUTPUT);
-      pinMode(5, OUTPUT);
-      pinMode(6, OUTPUT);
-      analogWrite(3, LOW);  
-      analogWrite(4, LOW);
-      analogWrite(5, LOW);
-      analogWrite(6, LOW);
+    // Set up motor drivers
+    Serial.println("Intializing motor drivers");
+    pinMode(3, OUTPUT);
+    pinMode(4, OUTPUT);
+    pinMode(5, OUTPUT);
+    pinMode(6, OUTPUT);
+    analogWrite(3, LOW);  
+    analogWrite(4, LOW);
+    analogWrite(5, LOW);
+    analogWrite(6, LOW);
 
     // Initial values for characteristics
     // Set initial values to prevent errors when reading for the first time on central devices
@@ -685,18 +724,18 @@ void setup() {
     pinMode(7, OUTPUT);
     digitalWrite(7, LOW);  
 
-// Display the SideTOF I2C address then change its address
-    SERIAL_PORT.print("Initial sideTOF I2C address: ");
-    SERIAL_PORT.println(sideTOF.getI2CAddress());
+    // Display the SideTOF I2C address then change its address
+    //SERIAL_PORT.print("Initial sideTOF I2C address: ");
+    //SERIAL_PORT.println(sideTOF.getI2CAddress());
     sideTOF.setI2CAddress(0x54);
-    SERIAL_PORT.print("Changed sideTOF I2C address to: ");
-    SERIAL_PORT.println(sideTOF.getI2CAddress());
+    //SERIAL_PORT.print("Changed sideTOF I2C address to: ");
+    //SERIAL_PORT.println(sideTOF.getI2CAddress());
 
     // Enable Front sensor
     digitalWrite(7, HIGH);
-    delay(500);
-    SERIAL_PORT.print("Initial frontTOF I2C address: ");
-    SERIAL_PORT.println(frontTOF.getI2CAddress());
+    delay(100);
+    //SERIAL_PORT.print("Initial frontTOF I2C address: ");
+    //SERIAL_PORT.println(frontTOF.getI2CAddress());
 
     if (sideTOF.begin() != 0) //Begin returns 0 on a good init
     {
@@ -706,11 +745,16 @@ void setup() {
     }
     if (frontTOF.begin() != 0) //Begin returns 0 on a good init
     {
-      Serial.println("Side Sensor failed to begin. Please check wiring. Freezing...");
+      Serial.println("Front Sensor failed to begin. Please check wiring. Freezing...");
       while (1)
         ;
     }
     Serial.println("ToF Sensors online!");
+
+    // Blink the LED 3 times to indicate we are up and running
+    pinMode(LED_BUILTIN, OUTPUT);
+    blink3();
+
 }
 
 void write_data() {
@@ -735,17 +779,61 @@ void read_data() {
     }
 }
 
+int setMotorspeed(float pid_output) {
+    // update pwm value of motors based on pid_out
+    // pid_out ranges from -100 to 100
+    // positive numbers mean forward, negative numbers mean reverse
+    // 
+    // Use a correction factor inside here if the car does not run striaght
+    // Also set the minimum pwm value to get the car to move, then scale the remaining values
+
+    int value;
+
+    value = int(deadzone + abs(pid_output) * (255-deadzone)/100);
+    if (abs(pid_output) < 0.1) {
+      value = 0;
+      analogWrite(3, 255);  
+      analogWrite(4, 255);
+      analogWrite(5, 255);
+      analogWrite(6, 255);
+    } else if (pid_output >= 0.1) {
+      analogWrite(4, 0);
+      analogWrite(3, value);  
+      analogWrite(5, 0);
+      analogWrite(6, value);
+    } else {
+      analogWrite(3, 0);
+      analogWrite(4, value);  
+      analogWrite(6, 0);
+      analogWrite(5, value);
+      value = -value;  // return a negative number for logging
+    }
+
+    return value;
+}
+  
 void full_stop() {
     // Stop the car, turn off the motor drivers
-      analogWrite(3, HIGH);  
-      analogWrite(4, HIGH);
-      analogWrite(5, HIGH);
-      analogWrite(6, HIGH);
-      delay(3000);
-      analogWrite(3, LOW);  
-      analogWrite(4, LOW);
-      analogWrite(5, LOW);
-      analogWrite(6, LOW);
+    analogWrite(3, 255);  
+    analogWrite(4, 255);
+    analogWrite(5, 255);
+    analogWrite(6, 255);
+    delay(1000);
+    analogWrite(3, 0);  
+    analogWrite(4, 0);
+    analogWrite(5, 0);
+    analogWrite(6, 0);
+}
+
+float getFrontTOF() {
+    frontTOF.startRanging();
+    while (!frontTOF.checkForDataReady())
+      {
+        delay(1);
+      }
+    frontTOF.clearInterrupt();
+    frontTOF.stopRanging();
+    return frontTOF.getDistance();
 }
 
 void loop() {
