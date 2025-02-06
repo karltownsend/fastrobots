@@ -70,7 +70,7 @@ class EString
     }
 
     /**
-     * Append an interger to the character array
+     * Append an integer to the character array
      *
      * @param value integer value to append
      */
@@ -108,7 +108,7 @@ class EString
     void append(float value)
     {
         int integer_part = (int)(value);
-        int decimal_part = 1000 * abs(value - integer_part); //10^3 for 3 decimal places
+        int decimal_part = 10000 * abs(value - integer_part); //10^3 for 3 decimal places
 
         append(integer_part);
         strcat(char_array, ".");
@@ -123,7 +123,7 @@ class EString
     void append(double value)
     {
         int integer_part = (int)(value);
-        int decimal_part = 1000 * abs(value - integer_part); //10^3 for 3 decimal places
+        int decimal_part = 10000 * abs(value - integer_part); //10^3 for 3 decimal places
 
         append(integer_part);
         strcat(char_array, ".");

@@ -1,6 +1,6 @@
-#include "/Users/karlt/Documents/GitHub/fastrobots/arduino/BLECStringCharacteristic.h"
-#include "/Users/karlt/Documents/GitHub/fastrobots/arduino/EString.h"
-#include "/Users/karlt/Documents/GitHub/fastrobots/arduino/RobotCommand.h"
+#include "/Users/Karl/Documents/GitHub/fastrobots/arduino/BLECStringCharacteristic.h"
+#include "/Users/Karl/Documents/GitHub/fastrobots/arduino/EString.h"
+#include "/Users/Karl/Documents/GitHub/fastrobots/arduino/RobotCommand.h"
 #include <ArduinoBLE.h>
 #include <ICM_20948.h>
 #include <SparkFun_VL53L1X.h> //Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X
@@ -40,7 +40,7 @@ unsigned long currentMillis = 0;
 int i;
 long time_start, time_now, time_stamp, time_prev, cnt, period;
 float dt, alpha, alpha_lpf;
-#define data_size 2500
+#define data_size 3000
 int time_array[data_size];
 float temp_array[data_size];
 float pitch_a[data_size], roll_a[data_size];
@@ -52,7 +52,7 @@ float pitch_g[data_size], roll_g[data_size], yaw_g[data_size];
 float pitch_g_lpf[data_size], roll_g_lpf[data_size], yaw_g_lpf[data_size];
 bool imu_ready;
 float fdist[data_size], sdist[data_size], pid[data_size], motor_pwm[data_size];
-float kp=0.01, ki=0.0, kd=0.0, pid_out=100;
+float kp=0.015, ki=0.001, kd=0.0, pid_out=100;
 int pid_max = 100, deadzone = 30;
 float P[data_size], I[data_size], D[data_size];
 
@@ -156,6 +156,30 @@ void handle_command() {
              * Your code goes here.
              */
 
+            float float_a, float_b, float_c;
+
+            // Extract the next value from the command string as a float
+            success = robot_cmd.get_next_value(float_a);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as a float
+            success = robot_cmd.get_next_value(float_b);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as a float
+            success = robot_cmd.get_next_value(float_c);
+            if (!success)
+                return;
+
+            Serial.print("Three Floats: ");
+            Serial.print(float_a, 4);
+            Serial.print(", ");
+            Serial.print(float_b, 4);
+            Serial.print(", ");
+            Serial.println(float_c, 4);
+            
             break;
         /*
          * Add a prefix and postfix to the string value extracted from the command string
@@ -414,7 +438,7 @@ void handle_command() {
 
           // Init variables
           #define max_time 8000
-          #define wall_dist 305 * 1.5   // 1 foot = 305 mm
+          #define wall_dist 305 * 1.5 // 1 foot = 305 mm
           float front_dist, prev_dist;
           float dist_neg2, dist_neg1;
           int time_neg2, time_neg1;
@@ -425,16 +449,45 @@ void handle_command() {
           errSum = 0.0;
           prev_error = 0.0;
 
+          // Print out the variables for this routine
+          tx_estring_value.clear();
+          tx_estring_value.append("KP:");
+          tx_estring_value.append(kp);
+          tx_estring_value.append(" KI:");
+          tx_estring_value.append(ki);
+          tx_estring_value.append(" KD:");
+          tx_estring_value.append(kd);
+          tx_estring_value.append(" PID_MAX:");
+          tx_estring_value.append(pid_max);
+          tx_estring_value.append(" DEADZONE:");
+          tx_estring_value.append(deadzone);
+          tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
           // get one range value before we start the car
           dist_neg2 = getFrontTOF();
           time_neg2 = millis();
+          front_dist = dist_neg2;
+
+          Serial.print("First value: ");
+          Serial.print(time_neg2);
+          Serial.print(", ");
+          Serial.println(dist_neg2);
 
           // Start the car
-          pwm_value = setMotorspeed(50);
+          pwm_value = setMotorspeed(pid_max);
+
+          Serial.print("Start the car with pwm: ");
+          Serial.println(pwm_value);
 
           // get a second range value
           dist_neg1 = getFrontTOF();
           time_neg1 = millis();
+
+          Serial.print("Second value: ");
+          Serial.print(time_neg1);
+          Serial.print(", ");
+          Serial.println(dist_neg1);
+
           // start new ranging
           frontTOF.startRanging();
 
@@ -477,7 +530,13 @@ void handle_command() {
             if (abs(error) < 0.1) {
               errSum = 0;
             }
-            // reset errSum if error is greatean than 2 feet or 600 mm
+            if (errSum > 200) {
+              errSum = 200;
+            } else if (errSum < -200) {
+              errSum = -200;
+            }
+
+            // reset errSum if error is greater than 2 feet or 600 mm
             if (abs(error) > 600) {
               errSum = 0;
             }
@@ -518,11 +577,18 @@ void handle_command() {
           frontTOF.clearInterrupt();
           frontTOF.stopRanging();
 
+          tx_estring_value.clear();
+          tx_estring_value.append("  Finished Go Wall");
+          tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
           break;
 
         case GET_WALL_DATA:
 
           Serial.println("Sending wall data");
+          tx_estring_value.clear();
+          tx_estring_value.append("  Sending PID data ...");
+          tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
           time_start = millis();
 
@@ -555,6 +621,10 @@ void handle_command() {
             Serial.print("Total time: ");
             Serial.print((millis() - time_start)/1000.0);
             Serial.println(" seconds");
+
+            tx_estring_value.clear();
+            tx_estring_value.append("  Data sent!");
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
           break;
 
@@ -595,11 +665,11 @@ void handle_command() {
             deadzone = int(e);
 
             Serial.print("Kp: ");
-            Serial.print(kp);
+            Serial.print(kp, 4);
             Serial.print("  Ki: ");
-            Serial.print(ki);
+            Serial.print(ki, 4);
             Serial.print("  Kd: ");
-            Serial.print(kd);
+            Serial.print(kd, 4);
             Serial.print("  PID_MAX: ");
             Serial.print(pid_max);
             Serial.print("  DEADZONE: ");
