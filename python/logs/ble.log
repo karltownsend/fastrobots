@@ -665,3 +665,98 @@
 2024-10-30 15:45:48,652 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
 2024-10-30 15:45:51,780 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
 2024-10-30 15:49:11,796 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-01 17:26:52,145 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=12, micro=2, releaselevel='final', serial=0)
+2024-11-01 17:26:52,145 | MainThread   | [DEBUG   ] | __init__            |: System Info: macOS-15.1-arm64-arm-64bit
+2024-11-01 17:26:52,145 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 17:27:14,040 | MainThread   | [ERROR   ] | _connect            |: disconnected
+2024-11-01 17:27:15,048 | MainThread   | [WARNING ] | connect             |: Attempting to connect again...
+2024-11-01 17:27:15,052 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 17:37:02,316 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 17:37:05,277 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-01 17:38:54,249 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-01 17:39:30,673 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 17:39:33,537 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-01 17:42:44,585 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-01 21:45:37,533 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 21:45:40,440 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-01 21:47:26,024 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-01 21:48:55,613 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-01 21:48:58,559 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-01 21:50:26,533 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-05 17:46:40,003 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-05 17:46:42,902 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-05 17:47:40,190 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-05 17:47:57,042 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-05 17:47:59,972 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-05 17:49:23,030 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-05 17:49:33,598 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-05 17:49:36,482 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-05 17:58:16,719 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-05 18:08:54,256 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-05 18:08:57,096 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-05 18:10:46,937 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-05 21:43:59,699 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-05 21:44:02,561 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-05 21:45:30,584 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-13 08:42:47,102 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-13 08:42:50,062 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-13 09:12:18,828 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-13 09:12:21,748 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-13 09:15:43,053 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-13 09:15:48,867 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-13 09:15:51,747 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-13 09:21:06,616 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-13 09:24:05,200 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-13 09:24:08,137 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-13 09:26:08,752 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 12:52:41,366 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 12:52:44,231 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 12:58:02,471 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:05:28,249 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:05:31,138 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:30:46,740 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:30:59,922 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:31:02,794 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:37:52,124 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:38:24,769 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:38:27,603 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:41:19,391 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:41:33,944 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:41:36,813 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:44:11,262 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:44:25,350 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:44:28,233 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:58:28,222 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:58:31,185 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 14:59:14,604 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 14:59:21,671 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 14:59:24,581 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 15:00:11,431 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 15:01:11,829 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 15:01:14,713 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 15:01:55,066 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 15:05:45,006 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 15:05:48,187 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 15:12:55,189 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 15:13:33,866 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 15:13:36,788 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 15:26:41,741 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 15:27:18,793 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 15:27:22,046 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 15:34:55,075 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 15:35:14,648 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 15:35:18,228 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 17:08:09,675 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 17:08:22,962 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 17:08:33,100 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 17:08:36,004 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 17:36:40,956 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 17:38:04,741 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 17:38:07,672 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 17:39:02,795 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 17:39:39,826 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 17:39:42,771 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 17:47:03,516 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
+2024-11-16 17:47:23,868 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:ec:f2:c2:23:04
+2024-11-16 17:47:26,782 | MainThread   | [INFO    ] | _connect            |: Connected to c0:ec:f2:c2:23:04
+2024-11-16 17:49:15,754 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from E8E0F7A4-7773-8749-3CAD-EADBED93F90E
