@@ -70,7 +70,7 @@ class EString
     }
 
     /**
-     * Append an integer to the character array
+     * Append an interger to the character array
      *
      * @param value integer value to append
      */
@@ -108,10 +108,26 @@ class EString
     void append(float value)
     {
         int integer_part = (int)(value);
-        int decimal_part = 10000 * abs(value - integer_part); //10^3 for 3 decimal places
+        int decimal_part = 1000 * abs(value - integer_part); //10^3 for 3 decimal places
 
-        append(integer_part);
+        // Account for negative values
+        if (value < 0) {
+            strcat(char_array, "-");
+        }
+
+        // Write absolute integer value
+        append(abs(integer_part));
         strcat(char_array, ".");
+
+        // Account for leading zeros
+        if (decimal_part < 100) {
+            append(0);
+        }
+        if (decimal_part < 10) {
+            append(0);
+        }
+
+        // Write decimal value
         append(decimal_part);
     }
 
@@ -123,10 +139,26 @@ class EString
     void append(double value)
     {
         int integer_part = (int)(value);
-        int decimal_part = 10000 * abs(value - integer_part); //10^3 for 3 decimal places
+        int decimal_part = 1000 * abs(value - integer_part); //10^3 for 3 decimal places
 
-        append(integer_part);
+        // Account for negative values
+        if (value < 0) {
+            strcat(char_array, "-");
+        }
+
+        // Write absolute integer value
+        append(abs(integer_part));
         strcat(char_array, ".");
+
+        // Account for leading zeros
+        if (decimal_part < 100) {
+            append(0);
+        }
+        if (decimal_part < 10) {
+            append(0);
+        }
+
+        // Write decimal value
         append(decimal_part);
     }
 };

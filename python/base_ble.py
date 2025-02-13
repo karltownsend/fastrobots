@@ -92,7 +92,8 @@ class BLEAsyncDevice():
             LOG.info('Looking for Artemis Nano Peripheral Device: {}'.format(self.address))
             success = False
             device = await self._get_ble_device()
-            self.client = BleakClient(device)
+#            self.client = BleakClient(device)
+            self.client = BleakClient(device, disconnected_callback=self.disconnect_handler)
             try:
                 await self.client.connect()
                 success = True
@@ -101,7 +102,7 @@ class BLEAsyncDevice():
                 LOG.error(e)
 
             if self.client.is_connected:
-                self.client.set_disconnected_callback(self.disconnect_handler)
+#                self.client.set_disconnected_callback(self.disconnect_handler)
                 LOG.info("Connected to {}".format(self.address))
             
             return success

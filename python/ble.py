@@ -114,6 +114,13 @@ class ArtemisBLEController(BaseBLEController):
                 config_list = yaml.load(file,
                                         Loader=yaml.FullLoader)
                 address = config_list["artemis_address"]
+                def add_leading_0s(address):
+                    pieces = address.split(':')
+                    for i,piece in enumerate(pieces):
+                        if(len(piece) == 1):
+                            pieces[i] = "0" + piece
+                    return (':').join(pieces)
+                address = add_leading_0s(address)
                 service_uuid = config_list["ble_service"]
                 uuid = config_list["characteristics"]
                 return address, service_uuid, uuid

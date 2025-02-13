@@ -3,20 +3,13 @@
 #include "RobotCommand.h"
 #include <ArduinoBLE.h>
 #include <ICM_20948.h>
-#include <SparkFun_VL53L1X.h>  //Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X
+#include <SparkFun_VL53L1X.h> //Click here to get the library: http://librarymanager/All#SparkFun_VL53L1X
 #include <math.h>
 #include "motor.h"
 #include "car.h"
 
-// Arduino pin defines
-#define MOTOR_LEFT_IN1 3
-#define MOTOR_LEFT_IN2 4
-// Right Motor runs backwards so swap the pin numbers
-#define MOTOR_RIGHT_IN1 6
-#define MOTOR_RIGHT_IN2 5
-#define FRONT_TOF_SHUTDOWN 7  //Active Low
-
 // Defines for IMU
+#define SERIAL_PORT Serial
 #define WIRE_PORT Wire
 #define AD0_VAL 0
 
@@ -93,9 +86,8 @@ SFEVL53L1X sideTOF;
 SFEVL53L1X frontTOF;
 
 // Create the motors
-Motor motorL(MOTOR_LEFT_IN1, MOTOR_LEFT_IN2);
-Motor motorR(MOTOR_RIGHT_IN1, MOTOR_RIGHT_IN2);
-Car car(motorL, motorR);
+Motor motor_left;
+Motor motor_right;
 
 void blink3() {
   for (i=0; i<3; i++) {
@@ -439,22 +431,12 @@ void handle_command() {
             if (!success)
                 return;
 
-            if (pwm_a != 0) {
-              motorL.forward(pwm_a);
-              }
-            else if (pwm_b != 0) {
-              motorL.reverse(pwm_b);
-            }
-
-            if (pwm_c != 0) {
-              motorR.forward(pwm_c);
-              }
-            else if (pwm_d != 0) {
-              motorR.reverse(pwm_d);
-            }
-              
+            analogWrite(3, pwm_a);  
+            analogWrite(4, pwm_b);
+            analogWrite(5, pwm_d);
+            analogWrite(6, pwm_c);
             delay(pwm_delay);
-            car.stop();
+            full_stop();
 
             break;
 
@@ -597,7 +579,7 @@ void handle_command() {
 
           //end loop, stop motors and ToF sensor
           cnt = i;
-          car.stop();
+          full_stop();
           frontTOF.clearInterrupt();
           frontTOF.stopRanging();
 
@@ -749,8 +731,7 @@ void setup() {
     Wire.begin();
     Wire.setClock(400000);
     bool initialized = false;
-
-    myICM.begin(Wire, AD0_VAL);
+    myICM.begin(WIRE_PORT, AD0_VAL);
 
     Serial.print(F("\n\nInitialization of the IMU returned: "));
     Serial.println(myICM.statusString());
@@ -766,7 +747,19 @@ void setup() {
 
     // Set up motor drivers
     Serial.println("Intializing motor drivers");
+    Motor motorL(4, 3);
+    Motor motorR(6, 5);
+    Car car(motorL, motorR);
     car.begin();
+
+//    pinMode(3, OUTPUT);
+//    pinMode(4, OUTPUT);
+//    pinMode(5, OUTPUT);
+//    pinMode(6, OUTPUT);
+//    analogWrite(3, LOW);  
+//    analogWrite(4, LOW);
+//    analogWrite(5, LOW);
+//    analogWrite(6, LOW);
 
     // Initial values for characteristics
     // Set initial values to prevent errors when reading for the first time on central devices
@@ -776,21 +769,26 @@ void setup() {
      * An example using the EString
      */
     // Clear the contents of the EString before using it
-//    tx_estring_value.clear();
+    tx_estring_value.clear();
 
     // Append the string literal "[->"
-//    tx_estring_value.append("[->");
+    tx_estring_value.append("[->");
 
     // Append the float value
-//    tx_estring_value.append(9.0);
+    tx_estring_value.append(9.0);
 
     // Append the string literal "<-]"
-//    tx_estring_value.append("<-]");
+    tx_estring_value.append("<-]");
 
     // Write the value to the characteristic
-//    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
-    // Set up the IMU
+    // Output MAC Address
+    Serial.print("Advertising BLE with MAC: ");
+    Serial.println(BLE.address());
+
+    BLE.advertise();
+
     ICM_20948_fss_t myFSS;
     myFSS.a = gpm2;
     myFSS.g = dps1000;
@@ -803,15 +801,21 @@ void setup() {
 
     // Set up TOF sensors
     // Shut down front sensor
-    pinMode(FRONT_TOF_SHUTDOWN, OUTPUT);
-    digitalWrite(FRONT_TOF_SHUTDOWN, LOW);  
+    pinMode(7, OUTPUT);
+    digitalWrite(7, LOW);  
 
     // Display the SideTOF I2C address then change its address
+    //Serial.print("Initial sideTOF I2C address: ");
+    //Serial.println(sideTOF.getI2CAddress());
     sideTOF.setI2CAddress(0x54);
+    //Serial.print("Changed sideTOF I2C address to: ");
+    //Serial.println(sideTOF.getI2CAddress());
 
     // Enable Front sensor
-    digitalWrite(FRONT_TOF_SHUTDOWN, HIGH);
-    delay(5);
+    digitalWrite(7, HIGH);
+    delay(100);
+    //Serial.print("Initial frontTOF I2C address: ");
+    //Serial.println(frontTOF.getI2CAddress());
 
     if (sideTOF.begin() != 0) //Begin returns 0 on a good init
     {
@@ -826,12 +830,6 @@ void setup() {
         ;
     }
     Serial.println("ToF Sensors online!");
-
-    // Output MAC Address and start BLE advertising
-    Serial.print("Advertising BLE with MAC: ");
-    Serial.println(BLE.address());
-
-    BLE.advertise();
 
     // Blink the LED 3 times to indicate we are up and running
     pinMode(LED_BUILTIN, OUTPUT);
@@ -849,6 +847,7 @@ void write_data() {
         if (tx_float_value > 10000) {
             tx_float_value = 0;
         }
+
         previousMillis = currentMillis;
     }
 }
@@ -889,7 +888,21 @@ int setMotorspeed(float pid_output) {
       analogWrite(5, value);
       value = -value;  // return a negative number for logging
     }
+
     return value;
+}
+  
+void full_stop() {
+    // Stop the car, turn off the motor drivers
+    analogWrite(3, 255);  
+    analogWrite(4, 255);
+    analogWrite(5, 255);
+    analogWrite(6, 255);
+    delay(1000);
+    analogWrite(3, 0);  
+    analogWrite(4, 0);
+    analogWrite(5, 0);
+    analogWrite(6, 0);
 }
 
 float getFrontTOF() {
@@ -921,7 +934,7 @@ void loop() {
             // Read data
             read_data();
         }
-        car.stop();
+        full_stop();
         Serial.println("Disconnected");
     }
 }
