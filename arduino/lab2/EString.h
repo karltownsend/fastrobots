@@ -70,7 +70,7 @@ class EString
     }
 
     /**
-     * Append an interger to the character array
+     * Append an integer to the character array
      *
      * @param value integer value to append
      */
