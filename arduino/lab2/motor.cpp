@@ -1,13 +1,5 @@
 #include "Motor.h"
-
-#define MIN 0
-#define MAX 255
-
-Motor::Motor(byte pin1, byte pin2)
-{
-  this->pin1 = pin1;
-  this->pin2 = pin2;
-}
+#include "constants.h"
 
 void Motor::begin()
 {

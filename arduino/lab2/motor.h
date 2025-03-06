@@ -10,9 +10,8 @@ private:
   byte pin2;
 
 public:
-  Motor() {}  // Default Constructor - do not use
-  Motor(byte pin1, byte pin2);
- 
+  Motor(byte pin1, byte pin2) : pin1(pin1), pin2(pin2) {}
+
   void begin();
   void forward();
   void forward(byte pwm);  // pwm value in range 0..255
