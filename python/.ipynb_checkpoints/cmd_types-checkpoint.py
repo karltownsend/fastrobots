@@ -13,7 +13,8 @@ class CMD(Enum):
     SEND_TIME_DATA = 9
     GET_TEMP_READINGS = 10
     GET_IMU_DATA = 11
-    SET_PWM = 12
-    GO_WALL = 13
-    GET_WALL_DATA = 14
-    SET_PID_MAX = 15
+    GET_RANGE = 12
+    SET_PWM = 13
+    GO_WALL = 14
+    GET_WALL_DATA = 15
+    SET_PID_MAX = 16

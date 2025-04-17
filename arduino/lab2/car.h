@@ -8,7 +8,9 @@
 class Car
 {
 private:
+  byte pwm_max = MAX;
   byte deadzone = 40;
+  int motor_pwm;
   float correction = 1.1;
 
 public:
@@ -23,12 +25,14 @@ public:
   void reverse(byte pwm);  // pwm value in range 0..255
   void rotateLeft(byte pwm);
   void rotateRight(byte pwm);  
+  void coast();
   void stop();
 
+  void setPwmMax(byte pwm_max);
   void setDeadzone(byte deadzone);
   void setCorrection(float correction);
-  float setLinearSpeed(float pid_out);
-  float setRotateSpeed(float pid_out);
+  int setLinearSpeed(float pid_out);
+  int setRotateSpeed(float pid_out);
 };
 
 #endif

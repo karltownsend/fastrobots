@@ -15,7 +15,11 @@ void Car::begin() {
 // where 1 indicates no correction
 void Car::forward(byte pwm)  // pwm value in range 0..255
 {
-  motorL.forward(pwm * correction);
+  if (pwm * correction > MAX) {
+    pwm = MAX / correction;
+  }
+  
+  motorL.forward((byte)(pwm * correction));
   motorR.forward(pwm);
 }
 
@@ -24,28 +28,40 @@ void Car::forward(byte pwm)  // pwm value in range 0..255
 // where 1 indicates no correction
 void Car::reverse(byte pwm)  // pwm value in range 0..255
 {
-  motorL.reverse(pwm * correction);
+  if (pwm * correction > MAX) {
+  pwm = MAX / correction;
+}
+
+  motorL.reverse((byte)(pwm * correction));
   motorR.reverse(pwm);
 }
 
 void Car::rotateLeft(byte pwm)  // pwm value in range 0..255
 {
-  motorL.reverse(pwm * correction);
+  motorL.reverse((byte)(pwm * correction));
   motorR.forward(pwm);
 }
 
 void Car::rotateRight(byte pwm)  // pwm value in range 0..255
 {
-  motorL.forward(pwm * correction);
+  motorL.forward((byte)(pwm * correction));
   motorR.reverse(pwm);
+}
+
+void Car::coast() {
+  motorL.coast();
+  motorR.coast();
 }
 
 void Car::stop() {
   motorL.brake();
   motorR.brake();
   delay(1000);
-  motorL.coast();
-  motorR.coast();
+  coast();
+}
+
+void Car::setPwmMax(byte pwm_max) {
+  this->pwm_max = pwm_max;
 }
 
 void Car::setDeadzone(byte deadzone) {
@@ -54,32 +70,34 @@ void Car::setDeadzone(byte deadzone) {
 
 void Car::setCorrection(float correction) {
   this->correction = correction;
-  Serial.print("correction: ");
-  Serial.println(correction);
 }
 
-float Car::setLinearSpeed(float pid_output)
+int Car::setLinearSpeed(float pid_output)
 // update pwm value of motors based on pid_out
 // pid_out is in range -100..100
 // positive numbers mean forward, negative numbers mean reverse
 //
+// Use pwm_max to limit the maximum value of the pwm for the motors
+//
 // Use deadzone to set the minimum pwm value to get the car to move,
 // then scale the remaining values
 {
-  float motor_pwm = deadzone + abs(pid_output) * (MAX - deadzone) / 100;
   if (abs(pid_output) < 0.1) {
+    coast();  // coast the motors
     motor_pwm = 0;
-    stop();
-  } else if (pid_output >= 0.1) {
-    forward(motor_pwm);
   } else {
-    reverse(motor_pwm);
-    motor_pwm = -motor_pwm;  // return a negative number for logging
+      motor_pwm = (int)(deadzone + abs(pid_output) * (pwm_max - deadzone) / 100.0);
+      if (pid_output >= 0.1) {
+        forward((byte)motor_pwm);
+      } else {
+        reverse((byte)motor_pwm);
+        motor_pwm = -motor_pwm;  // return a negative number for logging
+      }
   }
   return motor_pwm;
 }
 
-float Car::setRotateSpeed(float pid_output)
+int Car::setRotateSpeed(float pid_output)
 // update pwm value of motors based on pid_out
 // pid_out is in range -100..100
 // positive numbers mean rotate left, negative numbers mean rotate right
@@ -87,15 +105,18 @@ float Car::setRotateSpeed(float pid_output)
 // Use deadzone to set the minimum pwm value to get the car to move,
 // then scale the remaining values
 {
-  float motor_pwm = deadzone + abs(pid_output) * (MAX - deadzone) / 100;
+  int motor_pwm = (int)(deadzone + abs(pid_output) * (pwm_max - deadzone) / 100.0);
+  
   if (abs(pid_output) < 0.1) {
     motor_pwm = 0;
     stop();
-  } else if (pid_output >= 0.1) {
-    rotateLeft(motor_pwm);
   } else {
-    rotateRight(motor_pwm);
-    motor_pwm = -motor_pwm;  // return a negative number for logging
+      if (pid_output >= 0.1) {
+        rotateLeft((byte)motor_pwm);
+      } else {
+        rotateRight((byte)motor_pwm);
+        motor_pwm = -motor_pwm;  // return a negative number for logging
+      }
   }
   return motor_pwm;
 }

@@ -2,13 +2,13 @@
 #include "EString.h"
 #include "RobotCommand.h"
 #include <ArduinoBLE.h>
-#include <PID_v1.h>
 #include <math.h>
 #include "constants.h"
 #include "utility.h"
 #include "car.h"
 #include "imu.h"
 #include "tof.h"
+#include "pid.h"
 
 //////////// Global Variables ////////////
 BLEService testService(BLE_UUID_TEST_SERVICE);
@@ -31,10 +31,11 @@ unsigned long currentMillis = 0;
 //////////// Global Variables ////////////
 int i;
 unsigned long time_start, time_now, time_stamp, time_prev;
-long cnt, period;
+int cnt, period;
 float dt, alpha, alpha_lpf;
 
 #define data_size 3000
+int max_time = 8000;
 int time_array[data_size];
 float temp_array[data_size];
 float pitch_a[data_size], roll_a[data_size];
@@ -46,12 +47,14 @@ float pitch_g[data_size], roll_g[data_size], yaw_g[data_size];
 float pitch_g_lpf[data_size], roll_g_lpf[data_size], yaw_g_lpf[data_size];
 float fdist[data_size], sdist[data_size], pid[data_size], motor_pwm[data_size];
 
-double kp = 0.015, ki = 0.001, kd = 0.0, pid_out = 100;
-double wall_dist = 305;  // 1 foot = 305 mm
-float wall_dist_f;  
-double correction = 1.2; // increase left wheel speed to keep the car going straight
-double front_dist, prev_dist;
-int pid_max = 100, deadzone = 40;
+float front_dist, current_angle;
+float kp = 0.015, ki = 0.001, kd = 0.0, pid_out = 100;
+float kp_r, ki_r, kd_r, pid_out_angle;
+float wall_dist = 305;  // 1 foot = 305 mm
+float set_angle;
+
+float correction = 1.2;  // increase left wheel speed to keep the car going straight
+int pwm_max = MAX, deadzone = 40;
 float P[data_size], I[data_size], D[data_size];
 
 enum CommandTypes {
@@ -67,6 +70,7 @@ enum CommandTypes {
   SEND_TIME_DATA,
   GET_TEMP_READINGS,
   GET_IMU_DATA,
+  GET_RANGE,
   SET_PWM,
   GO_WALL,
   GET_WALL_DATA,
@@ -78,7 +82,8 @@ Car car;
 Imu imu;
 Tof sideTOF;
 Tof frontTOF(FRONT_TOF_SHUTDOWN);
-PID myPID(&front_dist, &pid_out, &wall_dist, kp, ki, kd, P_ON_E, REVERSE);
+PID LinearPID(&front_dist, &pid_out, &wall_dist, kp, ki, kd);
+PID RotatePID(&current_angle, &pid_out_angle, &set_angle, kp_r, ki_r, kd_r);
 
 void handle_command() {
   // Set the command string from the characteristic value
@@ -357,9 +362,34 @@ void handle_command() {
       Serial.println(" seconds");
       break;
 
+    case GET_RANGE:
+
+      // Extract the pwm value from the command string as an integer
+      if (!robot_cmd.get_next_value(max_time))
+        return;
+
+      Serial.println("Get Range ...");
+
+      time_start = millis();
+      frontTOF.startRanging();
+
+      // Loop until we run out of time
+      while (time_now < (time_start + max_time)) {
+
+        time_now = millis();
+        front_dist = frontTOF.getRangeExtrapolation();
+
+        Serial.print(millis());
+        Serial.print("   ");
+        Serial.println(front_dist);
+      }
+
+      break;
+
     case SET_PWM:
 
-      int pwm, pwm_delay;
+      float pwm;
+      int pwm_delay;
 
       // Extract the pwm value from the command string as an integer
       if (!robot_cmd.get_next_value(pwm))
@@ -368,13 +398,8 @@ void handle_command() {
       // Extract the movement time from the command string as an integer
       if (!robot_cmd.get_next_value(pwm_delay))
         return;
-
-      if (pwm > 0)
-        car.forward((byte)pwm);
-      else
-        car.reverse((byte)-pwm);
-      //car.motorL.setRaw(pwm_a, pwm_b);
-      //car.motorR.setRaw(pwm_c, pwm_d);
+            
+      car.setLinearSpeed(pwm);
       delay(pwm_delay);
       car.stop();
 
@@ -382,19 +407,13 @@ void handle_command() {
 
     case GO_WALL:
 
-// Init variables
-      #define max_time 8000
-      float dist_neg2, dist_neg1;
-      int time_neg2, time_neg1;
-      float slope;
+      // Init variables
       float pwm_value;
-      float error, errSum, delta, prev_error;
-      errSum = 0.0;
-      prev_error = 0.0;
+      LinearPID.begin();
 
       // Extract the optional distance to the wall from the command string as a float
-      if (robot_cmd.get_next_value(wall_dist_f))
-        wall_dist = (double)wall_dist_f;
+      //if (robot_cmd.get_next_value(wall_dist_f))
+      //  wall_dist = (double)wall_dist_f;
 
       time_start = millis();
 
@@ -406,8 +425,8 @@ void handle_command() {
       tx_estring_value.append(ki);
       tx_estring_value.append(" KD:");
       tx_estring_value.append(kd);
-      tx_estring_value.append(" PID_MAX:");
-      tx_estring_value.append(pid_max);
+      tx_estring_value.append(" PWM_MAX:");
+      tx_estring_value.append(pwm_max);
       tx_estring_value.append(" DEADZONE:");
       tx_estring_value.append(deadzone);
       tx_estring_value.append(" CORRECTION:");
@@ -416,118 +435,25 @@ void handle_command() {
       tx_estring_value.append(wall_dist);
       tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
-      // Using the built-in PID libraray
-      // 2.  output is from 0..255, so update the setMotor to handle this
-      myPID.SetSampleTime(1);
-      myPID.SetOutputLimits(-255, 255);
-      myPID.SetMode(AUTOMATIC);
-
-      // start new ranging - once started it continues until stop is called
+      // start ranging - once started it continues until stop is called
       frontTOF.startRanging();
 
-      // get one range value before we start the car
-      dist_neg2 = frontTOF.getRangeReal();
-      time_neg2 = millis();
-      front_dist = dist_neg2;
-
-      frontTOF.setDist2(dist_neg2);
-      frontTOF.setTime2(time_neg2);
-
-      //Serial.print("First value (time, dist): ");
-      //Serial.print(time_neg2);
-      //Serial.print(", ");
-      //Serial.println(dist_neg2);
-
       // Start the car
+      pid_out = 100;
       pwm_value = car.setLinearSpeed(pid_out);
 
-      //Serial.print("Start the car with pwm: ");
-      //Serial.println(pwm_value);
-
-      // get a second range value
-      dist_neg1 = frontTOF.getRangeReal();
-      time_neg1 = millis();
-      front_dist = dist_neg1;
-
-      frontTOF.setDist1(dist_neg1);
-      frontTOF.setTime1(time_neg1);
-
-      //Serial.print("Second value (time, dist): ");
-      //Serial.print(time_neg1);
-      //Serial.print(", ");
-      //Serial.println(dist_neg1);
-
-      time_prev = time_neg2;
-      time_now = time_neg1;
-      dt = time_prev - time_now;
+      time_now = millis();
       i = 0;
 
-      // Loop until we run out of time
-      while (time_now < (time_start + max_time)) {
+      // Loop until we get less than 5 mm or run out of time
+      while (!(fabs(front_dist - wall_dist) < 5.0 && fabs(pwm_value) < 1.0)  && time_now < (time_start + max_time)) {
 
-        // get new range value if ready
-        if (frontTOF.checkForDataReady()) {
-          front_dist = frontTOF.getDistance();
-          frontTOF.clearInterrupt();
-
-          // update previous distance and time
-          dist_neg2 = dist_neg1;
-          dist_neg1 = front_dist;
-          time_neg2 = time_neg1;
-          time_neg1 = time_now;
-
-        } else {
-          // do an extrapolation based on last 2 ToF values
-          slope = (dist_neg2 - dist_neg1) / (time_neg2 - time_neg1);
-          front_dist = dist_neg1 - slope * (time_neg1 - time_now);
-        }
-
-        /*// PID Controller
-        // Compute all the working error variables
-        error = front_dist - wall_dist;
-        errSum += error * dt;
-        delta = (error - prev_error) * dt;
-
-        // correct for large integral erros and wind-up
-        if (abs(error) < 0.1) {
-          errSum = 0;
-        }
-        // Correct for wind-up
-        if (errSum > 200) {
-          errSum = 200;
-        } else if (errSum < -200) {
-          errSum = -200;
-        }
-
-        // reset errSum if error is greater than 2 feet or 610 mm
-        if (abs(error) > 610) {
-          errSum = 0;
-        }
-
-        P[i] = error;
-        I[i] = errSum;
-        D[i] = delta;
-
-        // Calculate PID output
-        pid_out = kp * error + ki * errSum + kd * delta;
-        if (pid_out > 100) {
-          pid_out = 100;
-        } else if (pid_out < -100) {
-          pid_out = -100;
-        }
-*/
-        myPID.Compute();
-
-        //pid_out = pid_out * pid_max / 100;
+        front_dist = max(frontTOF.getRangeExtrapolation(), 20.0);  // accounts for the setback between the front TOF and the wheels
+        LinearPID.compute();  // PID controller automatically receives front_dist and modifies pid_out
         pwm_value = car.setLinearSpeed(pid_out);
 
-        Serial.print(time_now);
-        Serial.print(": ");
-        Serial.print(front_dist - wall_dist);
-        Serial.print("mm  PID:");
-        Serial.println(pid_out);
-
         // store data into arrays
+        LinearPID.getPID(&P[i], &I[i], &D[i]);
         time_array[i] = time_now;
         fdist[i] = front_dist;
         pid[i] = pid_out;
@@ -535,21 +461,17 @@ void handle_command() {
 
         // update loop variables
         i++;
-        prev_dist = front_dist;
-        time_prev = time_now;
         time_now = millis();
-        dt = time_prev - time_now;
-        prev_error = error;
       }
 
       //end loop, stop motors and ToF sensor
-      myPID.SetMode(MANUAL);
       cnt = i;
       car.stop();
       frontTOF.stop();
 
       tx_estring_value.clear();
-      tx_estring_value.append("  Finished Go Wall");
+      tx_estring_value.append("  Finished Go Wall ... ");
+      tx_estring_value.append(cnt);
       tx_characteristic_string.writeValue(tx_estring_value.c_str());
 
       break;
@@ -601,21 +523,20 @@ void handle_command() {
     case SET_PID_MAX:
 
       // use floats to get the values over BLE, then convert to doubles for the PID controller
-      float kp_f, ki_f, kd_f;
-      float correction_f;  
+      float correction;
 
       // Extract the PID value from the command string as floats
-      if (!robot_cmd.get_next_value(kp_f))
+      if (!robot_cmd.get_next_value(kp))
         return;
 
-      if (!robot_cmd.get_next_value(ki_f))
+      if (!robot_cmd.get_next_value(ki))
         return;
 
-      if (!robot_cmd.get_next_value(kd_f))
+      if (!robot_cmd.get_next_value(kd))
         return;
 
-      // Extract the pid_max from the command string as an integer
-      if (!robot_cmd.get_next_value(pid_max))
+      // Extract the pwm_max from the command string as an integer
+      if (!robot_cmd.get_next_value(pwm_max))
         return;
 
       // Extract the deadzone from the command string as an integer
@@ -623,22 +544,17 @@ void handle_command() {
         return;
 
       // Extract the wall distance from the command string as an integer
-      if (!robot_cmd.get_next_value(wall_dist_f))
+      if (!robot_cmd.get_next_value(wall_dist))
         return;
 
       // Extract the c orrection from the command string as an integer
-      if (!robot_cmd.get_next_value(correction_f))
+      if (!robot_cmd.get_next_value(correction))
         return;
 
-      kp = (double)kp_f;
-      ki = (double)ki_f;
-      kd = (double)kd_f;
-      wall_dist = (double)wall_dist_f;
-      correction = (double)correction_f;
-
-      myPID.SetTunings(kp, ki, kd);
+      LinearPID.setConstants(kp, ki, kd);
       car.setDeadzone((byte)deadzone);
-      car.setCorrection(correction_f);
+      car.setPwmMax(pwm_max);
+      car.setCorrection(correction);
 
       Serial.print("Kp: ");
       Serial.print(kp, 4);
@@ -646,8 +562,8 @@ void handle_command() {
       Serial.print(ki, 4);
       Serial.print("  Kd: ");
       Serial.print(kd, 4);
-      Serial.print("  PID_MAX: ");
-      Serial.print(pid_max);
+      Serial.print("  PWM_MAX: ");
+      Serial.print(pwm_max);
       Serial.print("  DEADZONE: ");
       Serial.println(deadzone);
 
@@ -658,8 +574,8 @@ void handle_command() {
       tx_estring_value.append(ki);
       tx_estring_value.append(" KD:");
       tx_estring_value.append(kd);
-      tx_estring_value.append(" PID_MAX:");
-      tx_estring_value.append(pid_max);
+      tx_estring_value.append(" PWM_MAX:");
+      tx_estring_value.append(pwm_max);
       tx_estring_value.append(" DEADZONE:");
       tx_estring_value.append(deadzone);
       tx_estring_value.append(" WALL_DIST:");
@@ -671,10 +587,10 @@ void handle_command() {
       break;
 
     /* 
-         * The default case may not capture all types of invalid commands.
-         * It is safer to validate the command string on the central device (in python)
-         * before writing to the characteristic.
-         */
+    * The default case may not capture all types of invalid commands.
+    * It is safer to validate the command string on the central device (in python)
+    * before writing to the characteristic.
+    */
     default:
       Serial.print("Invalid Command Type: ");
       Serial.println(cmd_type);
@@ -734,9 +650,9 @@ void setup() {
       ;
   }
 
-  // Set distance mode
+  // Set distance mode to Long for both TOF sensors
   frontTOF.setDistanceModeLong();
-  //frontTOF.setDistanceModeShort();
+  sideTOF.setDistanceModeLong();
 
   Serial.println("ToF Sensors online!");
 

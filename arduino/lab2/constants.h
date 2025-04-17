@@ -10,14 +10,15 @@ const byte MOTOR_LEFT_IN2 = 4;
 // Right Motor runs backwards so swap the pin numbers
 const byte MOTOR_RIGHT_IN1 = 6;
 const byte MOTOR_RIGHT_IN2 = 5;
+
+// Defines for the TOF sensors
+// Include the Shutdown pin for the Front TOF sensor
 const byte FRONT_TOF_SHUTDOWN = 7;  //Active Low
+const byte SIDE_TOF_ADDRESS = 0x54;
 
 // Defines for IMU
 #define WIRE_PORT Wire
 #define AD0_VAL 0
-
-// Defines for TOF sensors
-const byte SIDE_TOF_ADDRESS = 0x54;
 
 //////////// BLE UUIDs ////////////
 #define BLE_UUID_TEST_SERVICE "fbaf56fb-a094-4bf5-b5b9-71571ba584a7"

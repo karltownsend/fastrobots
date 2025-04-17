@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 
-void blink(unsigned char no)
+void blink(unsigned char blink_num)
 {
-  for (int i=0; i<no; i++)
+  for (int i=0; i<blink_num; i++)
   {
     digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
     delay(500);                       // wait for a half second

@@ -8,28 +8,26 @@ void Motor::begin()
   coast();
 }
 
-void Motor::forward()
-{
-  analogWrite(pin1, MAX);
-  analogWrite(pin2, MIN);
-}
-
 void Motor::forward(byte pwm)
 {
-  analogWrite(pin1, pwm);
-  analogWrite(pin2, MIN);
-}
-
-void Motor::reverse()
-{
-  analogWrite(pin1, MIN);
-  analogWrite(pin2, MAX);
+  if (fast_decay) {
+    analogWrite(pin1, pwm);
+    analogWrite(pin2, MIN);
+  } else {
+    analogWrite(pin1, MAX);
+    analogWrite(pin2, pwm);
+  }
 }
 
 void Motor::reverse(byte pwm)
 {
-  digitalWrite(pin1, MIN);
-  analogWrite(pin2, pwm);
+  if (fast_decay) {
+    analogWrite(pin1, MIN);
+    analogWrite(pin2, pwm);
+  } else {
+    analogWrite(pin1, pwm);
+    analogWrite(pin2, MAX);
+  }
 }
 
 void Motor::coast()
@@ -48,4 +46,14 @@ void Motor::setRaw(byte pwm1, byte pwm2)
 {
   analogWrite(pin1, pwm1);  
   analogWrite(pin2, pwm2);
+}
+
+void Motor::setFastDecay()
+{
+  fast_decay = true;
+}
+
+void Motor::setSlowDecay()
+{
+  fast_decay = false;
 }
